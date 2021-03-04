@@ -16,6 +16,7 @@ dependencies:
 
   http: ^0.12.2
   uuid: ^2.2.2
+  logger: ^0.9.4
 
 dev_dependencies:
   flutter_test:

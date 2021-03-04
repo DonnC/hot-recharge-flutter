@@ -16,3 +16,14 @@ enum RECHARGERESPONSE {
   /// api request success but bulksmsapi returns a custom exception
   API_ERROR,
 }
+
+/// used internally when `enableLogger` is set to true
+/// used to determine log level
+enum LOG_LEVEL {
+  DEBUG,
+  INFO,
+  ERROR,
+  WARNING,
+  WTF,
+  LOG,
+}

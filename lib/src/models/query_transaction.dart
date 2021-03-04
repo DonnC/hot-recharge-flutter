@@ -2,7 +2,7 @@ import 'dart:convert';
 
 /// query transaction for reconciliation model
 class QueryTransaction {
-  final int replyCode;
+  final String replyCode;
   final String replyMsg;
   final String originalAgentReference;
   final Map<String, dynamic> rawReply;
@@ -50,7 +50,7 @@ class QueryTransaction {
       replyCode: map['ReplyCode'],
       replyMsg: map['ReplyMsg'],
       originalAgentReference: map['OriginalAgentReference'],
-      rawReply: Map<String, dynamic>.from(map['RawReply']),
+      rawReply: Map<String, dynamic>.from(json.decode(map['RawReply'])),
       agentReference: map['AgentReference'],
     );
   }

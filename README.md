@@ -2,6 +2,7 @@
 perform airtime topup across all networks, vouchers and zesa recharge with hot-recharge flutter plugin
 
 - ℹ Not an official hot-recharge flutter plugin
+- a flutter plugin port of [hot-recharge python library]()
 
 ## Plugin installation
 - add hotrecharge to your `pubspec.yaml` file
@@ -10,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  hotrecharge: <latest-version>
+  hot_recharge: any
 ```
 
 ## [CHANGELOG](CHANGELOG.md)
@@ -25,8 +26,11 @@ please see full [changelog here](CHANGELOG.md)
 - `accessPswd` := the password of the account used on registration
   
 ```dart
+// import hot-recharge plugin
+import 'package:hot_recharge/hot_recharge.dart';
+
 // create api instance
-api = hotrecharge.HotRecharge(accessCode: '<your-email>', accessPswd: '<your-pwd>');
+api = HotRecharge(accessCode: '<your-email>', accessPswd: '<your-pwd>');
 ```
 
 ## Performing requests

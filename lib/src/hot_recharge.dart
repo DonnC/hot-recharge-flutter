@@ -12,18 +12,29 @@ class HotRecharge {
   // hot-recharge account password
   final String accessPswd;
 
+  // flag to enable | disable logging internal data to console
+  final bool enableLogger;
+
   String _email;
   String _pswd;
+  
   Api _api;
 
+  /// connect to hot-recharge services, accessCode: account email, accessPswd: account password
+  /// `enableLogger` set to true to enable printing internal detailed messages on console. Useful while testing
   HotRecharge({
     @required this.accessCode,
     @required this.accessPswd,
+    this.enableLogger: false,
   }) {
     _email = accessCode.trim();
     _pswd = accessPswd.trim();
 
-    _api = Api(email: _email, pswd: _pswd);
+    _api = Api(
+      email: _email,
+      pswd: _pswd,
+      enableLogger: enableLogger,
+    );
   }
 
   /// get account airtime topup wallet balance. Returns -> [ApiResponse]
