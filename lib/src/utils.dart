@@ -1,19 +1,19 @@
 /// hot-recharge api request respond
-/// property in [ApiResponse] -> statusresponse
-enum RECHARGERESPONSE {
+/// property in [ApiResponse] -> rechargeResponse
+enum RechargeResponse {
   /// api response successful
   SUCCESS,
 
-  /// error sending bulksms
+  /// error performing hot-recharge request
   ERROR,
 
-  /// internal error occured,
+  /// internal api service error occured,
   FAIL,
 
   /// zesa recharge, pending transaction
   PENDING,
 
-  /// api request success but bulksmsapi returns a custom exception
+  /// api request success but hot-recharge returns a custom exception code
   API_ERROR,
 }
 

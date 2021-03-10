@@ -4,17 +4,19 @@
   __version__ 1.0.0
   __name__    Hot Recharge
 
+  @created: 17 Feb 2021
+
   a python port for hot-recharge library
 */
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:logger/logger.dart';
+import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:hot_recharge/src/models/index.dart';
 import 'package:hot_recharge/src/utils.dart';
-import 'package:logger/logger.dart';
-import 'package:uuid/uuid.dart';
 
 class Api {
   static const String _ROOT_ENDPOINT = "https://ssl.hot.co.zw";
@@ -131,7 +133,7 @@ class Api {
 
         return ApiResponse(
           message: 'wallet balance success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: wb,
         );
       }
@@ -140,7 +142,7 @@ class Api {
 
       return ApiResponse(
         message: 'wallet balance failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
@@ -150,7 +152,7 @@ class Api {
       _log(e, LOG_LEVEL.ERROR);
 
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
@@ -179,7 +181,7 @@ class Api {
 
         return ApiResponse(
           message: 'zesa wallet balance success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: zb,
         );
       }
@@ -188,7 +190,7 @@ class Api {
 
       return ApiResponse(
         message: 'zesa wallet balance failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
@@ -198,7 +200,7 @@ class Api {
       _log(e, LOG_LEVEL.ERROR);
 
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
@@ -228,7 +230,7 @@ class Api {
 
         return ApiResponse(
           message: 'query transaction success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: qt,
         );
       }
@@ -237,7 +239,7 @@ class Api {
 
       return ApiResponse(
         message: 'query transaction failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
@@ -247,7 +249,7 @@ class Api {
       _log(e, LOG_LEVEL.ERROR);
 
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
@@ -325,7 +327,7 @@ class Api {
 
         return ApiResponse(
           message: 'recharge pinless success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: pr,
         );
       }
@@ -334,7 +336,7 @@ class Api {
 
       return ApiResponse(
         message: 'pinless recharge failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
@@ -344,13 +346,24 @@ class Api {
       _log(e, LOG_LEVEL.ERROR);
 
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
   }
 
-  Future<ApiResponse> checkZesaCustomer(var meterNumber) async {
+  Future<ApiResponse> checkZesaCustomer(String meterNumber) async {
+    if (meterNumber.length != 11) {
+      _log(
+          'zesa meter number must be equal to 11 chars: `$meterNumber` [${meterNumber.length}]',
+          LOG_LEVEL.ERROR);
+
+      return ApiResponse(
+        rechargeResponse: RechargeResponse.ERROR,
+        message: 'zesa meter number passed not equal to required char of 11',
+      );
+    }
+
     _autoUpdateReference();
 
     _log('making request for: query zesa customer', LOG_LEVEL.INFO);
@@ -380,7 +393,7 @@ class Api {
 
         return ApiResponse(
           message: 'check zesa customer success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: zcd,
         );
       }
@@ -389,7 +402,7 @@ class Api {
 
       return ApiResponse(
         message: 'check zesa customer failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
@@ -399,7 +412,7 @@ class Api {
       _log(e, LOG_LEVEL.ERROR);
 
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
@@ -453,7 +466,7 @@ class Api {
 
         return ApiResponse(
           message: 'zesa recharge success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: zr,
         );
       }
@@ -462,7 +475,7 @@ class Api {
         // pending zesa transaction
         return ApiResponse(
           message: 'zesa recharge pending',
-          statusresponse: RECHARGERESPONSE.PENDING,
+          rechargeResponse: RechargeResponse.PENDING,
           apiResponse: data,
         );
       }
@@ -471,7 +484,7 @@ class Api {
 
       return ApiResponse(
         message: 'zesa recharge failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
@@ -481,7 +494,7 @@ class Api {
       _log(e, LOG_LEVEL.ERROR);
 
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
@@ -515,14 +528,14 @@ class Api {
 
         return ApiResponse(
           message: 'query zesa transaction success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: data,
         );
       }
 
       return ApiResponse(
         message: 'query zesa transaction failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
@@ -532,7 +545,7 @@ class Api {
       _log(e, LOG_LEVEL.ERROR);
 
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }

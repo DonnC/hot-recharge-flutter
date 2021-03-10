@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'zesa_token.dart';
 
+/// response model on successful zesa recharge
 class ZesaRecharge {
   final int replyCode;
   final String replyMsg;
   final double walletBalance;
   final double amount;
   final double discount;
-  final meter;
+  final String meter;
   final String accountName;
   final String address;
   final ZesaTokenItem tokens;

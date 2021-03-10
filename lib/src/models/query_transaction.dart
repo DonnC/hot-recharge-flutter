@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-/// query transaction for reconciliation model
+/// query transaction for reconciliation model, get original transaction info sent on the date of the `originalAgentReference`
 class QueryTransaction {
   final String replyCode;
   final String replyMsg;

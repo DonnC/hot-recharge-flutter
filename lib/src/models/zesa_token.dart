@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-// zesa token item model
+/// zesa token item model, a property in [ZesaRecharge] -> tokens
 class ZesaTokenItem {
   final String token;
   final String units;

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+/// business topup account wallet balance
 class WalletBalance {
   final String agentReference;
   final int replyCode;

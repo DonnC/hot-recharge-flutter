@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+/// get business | user account zesa wallet balance
 class ZesaWalletBalance {
   final String agentReference;
   final int replyCode;
