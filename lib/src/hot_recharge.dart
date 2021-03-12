@@ -87,7 +87,7 @@ class HotRecharge {
   }
 
   /// get more information about zesa customer from meter-number
-  Future<ApiResponse> checkZesaCustomer(var meterNumber) async {
+  Future<ApiResponse> checkZesaCustomer(String meterNumber) async {
     final zesaCustomer = await _api.checkZesaCustomer(meterNumber);
 
     return zesaCustomer;

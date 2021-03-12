@@ -28,6 +28,7 @@ class Api {
   static const String _CHECK_ZESA_CUSTOMER = "agents/check-customer-zesa";
   static const String _QUERY_TRANSACTION = "agents/query-transaction?agentReference=";
   static const String _QUERY_ZESA = "agents/query-zesa-transaction";
+  static const String _END_USER_BALANCE = "agents/enduser-balance?targetmobile=";
 
   final String email;
   final String pswd;
@@ -74,7 +75,7 @@ class Api {
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _WALLET_BALANCE;
 
-      var response = await http.get(
+      http.Response response = await http.get(
         url,
         headers: this._headers,
       );
@@ -114,7 +115,7 @@ class Api {
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _ZESA_BALANCE;
 
-      var response = await http.get(
+      http.Response response = await http.get(
         url,
         headers: this._headers,
       );
@@ -155,7 +156,7 @@ class Api {
       String url =
           _ROOT_ENDPOINT + _API_VERSION + _QUERY_TRANSACTION + agentReference;
 
-      var response = await http.get(
+      http.Response response = await http.get(
         url,
         headers: this._headers,
       );
@@ -237,7 +238,7 @@ class Api {
 
       String url = _ROOT_ENDPOINT + _API_VERSION + _RECHARGE_PINLESS;
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: payload,
         headers: this._headers,
@@ -272,13 +273,13 @@ class Api {
     }
   }
 
-  Future<ApiResponse> checkZesaCustomer(var meterNumber) async {
+  Future<ApiResponse> checkZesaCustomer(String meterNumber) async {
     _autoUpdateReference();
 
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _CHECK_ZESA_CUSTOMER;
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: {
           'MeterNumber': meterNumber,
@@ -339,7 +340,7 @@ class Api {
 
       String url = _ROOT_ENDPOINT + _API_VERSION + _RECHARGE_ZESA;
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: payload,
         headers: this._headers,
@@ -389,7 +390,7 @@ class Api {
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _QUERY_ZESA;
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: {"RechargeId": rechargeId},
         headers: this._headers,
@@ -424,7 +425,17 @@ class Api {
     }
   }
 
-  Future<ApiResponse> endUserBalance (String mobileNumber) {
+  Future<ApiResponse> endUserBalance (String mobileNumber) async{
     this._autoUpdateReference();
+    http.Response response;
+    try {
+      String url = _ROOT_ENDPOINT + _API_VERSION + _END_USER_BALANCE + mobileNumber;
+      response = await http.get(url, headers: this._headers);
+
+      var data = json.decode(response.body);
+      print(data);
+    } catch (e) {
+      return ApiResponse(statusresponse: RECHARGERESPONSE.ERROR, message: e.toString(),);
+    }
   }
 }
