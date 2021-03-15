@@ -1,9 +1,6 @@
 name: hot_recharge
 description: a hot-recharge plugin for mobile airtime topup and zesa recharge
 version: 1.0.0
-author:
-  Donald Chinhuru<donychinhuru@gmail.com>
-  Ngonidzashe Mangudya <ngoni-email>
 homepage: https://github.com/DonnC/hot-recharge-flutter
 
 environment:
@@ -15,6 +12,8 @@ dependencies:
     sdk: flutter
 
   http: ^0.12.2
+  uuid: ^2.2.2
+  logger: ^0.9.4
 
 dev_dependencies:
   flutter_test:
