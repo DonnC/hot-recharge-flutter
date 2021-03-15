@@ -285,7 +285,7 @@ class Api {
 
       _headers.remove('Content-type');
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: payload,
         headers: this._headers,
@@ -351,7 +351,7 @@ class Api {
 
       _headers.remove('Content-type');
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: {
           'MeterNumber': meterNumber,
@@ -428,7 +428,7 @@ class Api {
 
       _headers.remove('Content-type');
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: payload,
         headers: this._headers,
@@ -492,7 +492,7 @@ class Api {
 
       _headers.remove('Content-type');
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: {"RechargeId": rechargeId.toString()},
         headers: this._headers,
