@@ -3,8 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'models/index.dart';
 import 'services/api.dart';
 
-/// connect to hot-recharge and perfom topup programmatically
-/// sign up for hot-recharge cooperate account or contact hot-recharge for proper account
+/// connect to hot-recharge and perfom airtime topup and zesa recharge
 class HotRecharge {
   // hot-recharge account email
   final String accessCode;
@@ -12,18 +11,29 @@ class HotRecharge {
   // hot-recharge account password
   final String accessPswd;
 
+  // flag to enable | disable logging internal data to console
+  final bool enableLogger;
+
   String _email;
   String _pswd;
+
   Api _api;
 
+  /// connect to hot-recharge services, accessCode: account email, accessPswd: account password
+  /// `enableLogger` set to true to enable printing internal detailed messages on console. Useful while testing
   HotRecharge({
     @required this.accessCode,
     @required this.accessPswd,
+    this.enableLogger: false,
   }) {
     _email = accessCode.trim();
     _pswd = accessPswd.trim();
 
-    _api = Api(email: _email, pswd: _pswd);
+    _api = Api(
+      email: _email,
+      pswd: _pswd,
+      enableLogger: enableLogger,
+    );
   }
 
   /// get account airtime topup wallet balance. Returns -> [ApiResponse]
@@ -49,9 +59,9 @@ class HotRecharge {
     return result;
   }
 
-  /// recharge a mobile number, number can be any supported zim number 07xxx.. or landline 08...
-  /// brandID - Optional:
-  /// customMessage - Optional, customised sms to send to user upon topup, 135 chars max
+  /// recharge a mobile number, number can be any supported zim number 07xxx.. or 08...
+  /// brandID - (Optional)
+  /// customMessage - (Optional), customised sms to send to user upon topup, 135 chars max
   ///      custom Message place holders to use and their representation on end user:
   ///      %AMOUNT% - $xxx.xx
   ///      %INITIALBALANCE% - $xxx.xx
@@ -87,6 +97,19 @@ class HotRecharge {
   }
 
   /// get more information about zesa customer from meter-number
+  /// meterNumber is a 11 char zesa meter number
+  /// it is advised to first check customer and prompt for them to verify the details from [CustomerInfo] -> customerName response
+  /// before proceeding to make zesa recharge payment
+  /// ```dart
+  /// var checkCustomer = await api.checkZesaCustomer('<a-11-digit-meter-number>');
+  ///
+  /// // show a dialog prompt for user to confirm their info before proceeding
+  /// // can be anything here just for user to confirm their details
+  /// showPromptDialog(checkCustomer.apiResponse.customerInfo.customerName);
+  ///
+  /// // if confirmed..proceed to make zesa recharge
+  /// // else, do something
+  /// ```
   Future<ApiResponse> checkZesaCustomer(String meterNumber) async {
     final zesaCustomer = await _api.checkZesaCustomer(meterNumber);
 
@@ -109,7 +132,8 @@ class HotRecharge {
   ///   The best %COMPANYNAME%!
   /// """;
   ///
-  /// var resp = api.rechargeZesa(2.5, '07xxxxxxxx', 'xxxxxxxxxxx', customMessage: custom_message);
+  /// var resp = await api.rechargeZesa(2.5, '07xxxxxxxx', 'xxxxxxxxxxx', customMessage: custom_message);
+  /// print(resp.message);
   /// ```
   /// return -> [ApiResponse]
   Future<ApiResponse> rechargeZesa(
@@ -129,10 +153,10 @@ class HotRecharge {
   }
 
   /// query previous zesa transaction by its rechargeID
-  /// also very useful for querying zesa recharge transactions for [ApiResponse] statusresponse -> [RECHARGERESPONSE.PENDING]
-  /// very useful when `rechargeZesa(...)` returns  [RECHARGERESPONSE.PENDING]. Its reccommended not to perform a recharge again but poll this query until transaction status is success
+  /// also very useful for querying zesa recharge transactions for [ApiResponse] rechargeResponse -> [RechargeResponse.PENDING]
+  /// very useful when `rechargeZesa(...)` returns  [RechargeResponse.PENDING]. Its reccommended not to perform a recharge again but poll this query until transaction status is success
   /// refer to Docs for more
-  Future<ApiResponse> queryZesaTransaction(String rechargeId) async {
+  Future<ApiResponse> queryZesaTransaction(int rechargeId) async {
     final queryZesa = _api.queryZesaTransaction(rechargeId);
 
     return queryZesa;

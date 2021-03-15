@@ -1,22 +1,14 @@
-/*
-  Hot Recharge Flutter Api Library
-  __author__  Donald Chinhuru | Ngonidzashe Mangudya
-  __version__ 1.0.0
-  __name__    Hot Recharge
-
-  a python port for hot-recharge library
-*/
-
 import 'dart:async';
 import 'dart:convert';
+import 'package:logger/logger.dart';
+import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:hot_recharge/src/models/index.dart';
-import 'package:hot_recharge/src/utils.dart';
-import 'package:uuid/uuid.dart';
+import '../../hot_recharge.dart';
+import '../utils.dart';
 
 class Api {
-  static const String _ROOT_ENDPOINT = "ssl.hot.co.zw";
+  static const String _ROOT_ENDPOINT = "https://ssl.hot.co.zw";
   static const String _API_VERSION = "/api/v1/";
   static const String _MIME_TYPES = "application/json";
 
@@ -32,16 +24,23 @@ class Api {
   static const String _END_USER_BALANCE =
       "agents/enduser-balance?targetmobile=";
 
+  var logger = Logger(
+    printer: PrettyPrinter(),
+  );
+
   final String email;
   final String pswd;
+  final bool enableLogger;
 
-  Map<String, dynamic> _headers;
+  Map<String, String> _headers;
 
   Api({
     this.email,
     this.pswd,
+    this.enableLogger,
   }) {
     this._buildHeaders();
+    _log('api service initialised', LOG_LEVEL.INFO);
   }
 
   /// auto generate agent-reference using uuid v4 chunk
@@ -51,7 +50,34 @@ class Api {
 
     var chunk = val.split('-');
 
+    _log('auto generated ref: ${chunk.first}', LOG_LEVEL.INFO);
+
     return chunk.first;
+  }
+
+  void _log(var message, LOG_LEVEL level) {
+    if (enableLogger) {
+      switch (level) {
+        case LOG_LEVEL.DEBUG:
+          logger.d(message);
+          break;
+
+        case LOG_LEVEL.INFO:
+          logger.i(message);
+          break;
+
+        case LOG_LEVEL.ERROR:
+          logger.e(message);
+          break;
+
+        case LOG_LEVEL.WARNING:
+          logger.w(message);
+          break;
+
+        default:
+          logger.i(message);
+      }
+    }
   }
 
   /// build up headers to use as requested in each request by the api
@@ -77,6 +103,8 @@ class Api {
   Future<ApiResponse> getWalletBalance() async {
     _autoUpdateReference();
 
+    _log('making request for: topup wallet balance', LOG_LEVEL.INFO);
+
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _WALLET_BALANCE;
 
@@ -85,7 +113,9 @@ class Api {
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
+
+      _log('raw topup wallet balance response: $data', LOG_LEVEL.DEBUG);
 
       if (data['ReplyCode'] == 2) {
         // success
@@ -93,22 +123,28 @@ class Api {
 
         return ApiResponse(
           message: 'wallet balance success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: wb,
         );
       }
 
+      _log(data, LOG_LEVEL.WARNING);
+
       return ApiResponse(
-        message: 'wallet balance failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'wallet balance failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
 
     // error
     catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
@@ -116,6 +152,8 @@ class Api {
 
   Future<ApiResponse> getZesaWalletBalance() async {
     _autoUpdateReference();
+
+    _log('making request for: zesa wallet balance', LOG_LEVEL.INFO);
 
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _ZESA_BALANCE;
@@ -125,7 +163,9 @@ class Api {
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
+
+      _log('zesa wallet balance response: $data', LOG_LEVEL.DEBUG);
 
       if (data['ReplyCode'] == 2) {
         // success
@@ -133,22 +173,28 @@ class Api {
 
         return ApiResponse(
           message: 'zesa wallet balance success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: zb,
         );
       }
 
+      _log(data, LOG_LEVEL.WARNING);
+
       return ApiResponse(
-        message: 'zesa wallet balance failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'zesa wallet balance failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
 
     // error
     catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
@@ -156,6 +202,8 @@ class Api {
 
   Future<ApiResponse> queryTopupTransaction(String agentReference) async {
     _autoUpdateReference();
+
+    _log('making request for: query topup transaction', LOG_LEVEL.INFO);
 
     try {
       String url =
@@ -166,56 +214,43 @@ class Api {
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
 
-      if (data['ReplyCode'] == 2) {
+      _log('query topup transaction response: $data', LOG_LEVEL.DEBUG);
+
+      if (data['ReplyCode'] == '2') {
         // success
         QueryTransaction qt = QueryTransaction.fromJson(response.body);
 
         return ApiResponse(
           message: 'query transaction success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: qt,
         );
       }
 
+      _log(data, LOG_LEVEL.WARNING);
+
       return ApiResponse(
-        message: 'query transaction failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'query transaction failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
 
     // error
     catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
   }
 
-  /// recharge a mobile number, number can be any supported zim number 07xxx.. or landline 08...
-  /// brandID - Optional:
-  /// customMessage - Optional, customised sms to send to user upon topup, 135 chars max
-  ///      custom Message place holders to use and their representation on end user:
-  ///      %AMOUNT% - $xxx.xx
-  ///      %INITIALBALANCE% - $xxx.xx
-  ///      %FINALBALANCE% - $xxx.xx
-  ///      %TXT% - xxx texts
-  ///      %DATA% - xxx MB
-  ///      %COMPANYNAME% - as defined by Customer on the website www.hot.co.zw
-  ///      %ACCESSNAME% - defined by Customer on website – Teller or Trusted User or branch name
-  ///
-  /// ```dart
-  /// final custom_message = """
-  ///   Your recharge of \$ %AMOUNT% is successful.
-  ///   Your final airtime bal: \$ %FINALBALANCE%.
-  ///   Thank you for using %COMPANYNAME%
-  /// """;
-  /// var resp = api.rechargePinless(2.5, '07xxxxxxxx', customMessage: custom_message);
-  /// ```
-  /// return: [ApiResponse]
   Future<ApiResponse> rechargePinless(
     double amount,
     String contact, {
@@ -224,10 +259,12 @@ class Api {
   }) async {
     _autoUpdateReference();
 
-    try {
-      Map<String, dynamic> payload;
+    _log('making request for: topup number', LOG_LEVEL.INFO);
 
-      payload['amount'] = amount;
+    try {
+      Map<String, dynamic> payload = Map<String, dynamic>();
+
+      payload['amount'] = amount.toString();
 
       if (brandID != null) {
         payload['BrandID'] = brandID;
@@ -241,15 +278,23 @@ class Api {
         payload['targetMobile'] = contact;
       }
 
+      _log('topup number payload: $payload', LOG_LEVEL.INFO);
+
       String url = _ROOT_ENDPOINT + _API_VERSION + _RECHARGE_PINLESS;
 
-      http.Response response = await http.post(
+      _headers.remove('Content-type');
+
+      var response = await http.post(
         url,
         body: payload,
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      _headers['Content-type'] = _MIME_TYPES;
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('topup number response: $data', LOG_LEVEL.DEBUG);
 
       if (data['ReplyCode'] == 2) {
         // success
@@ -257,34 +302,55 @@ class Api {
 
         return ApiResponse(
           message: 'recharge pinless success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: pr,
         );
       }
 
+      _log(data, LOG_LEVEL.WARNING);
+
       return ApiResponse(
-        message: 'pinless recharge failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'pinless recharge failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
 
     // error
     catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
   }
 
   Future<ApiResponse> checkZesaCustomer(String meterNumber) async {
+    if (meterNumber.length != 11) {
+      _log(
+          'zesa meter number must be equal to 11 chars: `$meterNumber` [${meterNumber.length}]',
+          LOG_LEVEL.ERROR);
+
+      return ApiResponse(
+        rechargeResponse: RechargeResponse.ERROR,
+        message: 'zesa meter number passed not equal to required char of 11',
+      );
+    }
+
     _autoUpdateReference();
+
+    _log('making request for: query zesa customer', LOG_LEVEL.INFO);
 
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _CHECK_ZESA_CUSTOMER;
 
-      http.Response response = await http.post(
+      _headers.remove('Content-type');
+
+      var response = await http.post(
         url,
         body: {
           'MeterNumber': meterNumber,
@@ -292,7 +358,11 @@ class Api {
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      _headers['Content-type'] = _MIME_TYPES;
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('query zesa customer response: $data', LOG_LEVEL.DEBUG);
 
       if (data['ReplyCode'] == 2) {
         // success
@@ -300,22 +370,28 @@ class Api {
 
         return ApiResponse(
           message: 'check zesa customer success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: zcd,
         );
       }
 
+      _log(data, LOG_LEVEL.WARNING);
+
       return ApiResponse(
-        message: 'check zesa customer failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'check zesa customer failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
 
     // error
     catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
@@ -329,10 +405,12 @@ class Api {
   }) async {
     _autoUpdateReference();
 
-    try {
-      Map<String, dynamic> payload;
+    _log('making request for: zesa recharge', LOG_LEVEL.INFO);
 
-      payload['Amount'] = amount;
+    try {
+      Map<String, dynamic> payload = Map<String, dynamic>();
+
+      payload['Amount'] = amount.toString();
       payload['meterNumber'] = meterNumber;
 
       if (customMessage != null) {
@@ -340,18 +418,26 @@ class Api {
       }
 
       if (contact.startsWith('07')) {
-        payload['TargetMobile'] = contact;
+        payload['TargetNumber'] = contact;
       }
+
+      _log('zesa recharge payload: $payload', LOG_LEVEL.INFO);
 
       String url = _ROOT_ENDPOINT + _API_VERSION + _RECHARGE_ZESA;
 
-      http.Response response = await http.post(
+      _headers.remove('Content-type');
+
+      var response = await http.post(
         url,
         body: payload,
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      _headers['Content-type'] = _MIME_TYPES;
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('zesa recharge response: $data', LOG_LEVEL.DEBUG);
 
       if (data['ReplyCode'] == 2) {
         // success
@@ -359,7 +445,7 @@ class Api {
 
         return ApiResponse(
           message: 'zesa recharge success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
+          rechargeResponse: RechargeResponse.SUCCESS,
           apiResponse: zr,
         );
       }
@@ -368,63 +454,81 @@ class Api {
         // pending zesa transaction
         return ApiResponse(
           message: 'zesa recharge pending',
-          statusresponse: RECHARGERESPONSE.PENDING,
+          rechargeResponse: RechargeResponse.PENDING,
           apiResponse: data,
         );
       }
 
+      _log(data, LOG_LEVEL.WARNING);
+
       return ApiResponse(
-        message: 'zesa recharge failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'zesa recharge failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
 
     // error
     catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
   }
 
-  Future<ApiResponse> queryZesaTransaction(String rechargeId) async {
+  Future<ApiResponse> queryZesaTransaction(int rechargeId) async {
     _autoUpdateReference();
+
+    _log('making request for: query zesa transaction', LOG_LEVEL.INFO);
 
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _QUERY_ZESA;
 
-      http.Response response = await http.post(
+      _headers.remove('Content-type');
+
+      var response = await http.post(
         url,
-        body: {"RechargeId": rechargeId},
+        body: {"RechargeId": rechargeId.toString()},
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
+
+      _headers['Content-type'] = _MIME_TYPES;
+
+      _log('query zesa transaction response: $data', LOG_LEVEL.DEBUG);
 
       if (data['ReplyCode'] == 2) {
         // success
-        // TODO: Return proper model
+        final QueryZesaTransaction qzt = QueryZesaTransaction.fromMap(data);
 
         return ApiResponse(
           message: 'query zesa transaction success',
-          statusresponse: RECHARGERESPONSE.SUCCESS,
-          apiResponse: data,
+          rechargeResponse: RechargeResponse.SUCCESS,
+          apiResponse: qzt,
         );
       }
 
       return ApiResponse(
-        message: 'query zesa transaction failed',
-        statusresponse: RECHARGERESPONSE.API_ERROR,
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'query zesa transaction failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
     }
 
     // error
     catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
@@ -442,9 +546,21 @@ class Api {
       return data;
     } catch (e) {
       return ApiResponse(
-        statusresponse: RECHARGERESPONSE.ERROR,
+        rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
       );
     }
   }
+}
+
+
+/// used internally when `enableLogger` is set to true
+/// used to determine log level
+enum LOG_LEVEL {
+  DEBUG,
+  INFO,
+  ERROR,
+  WARNING,
+  WTF,
+  LOG,
 }

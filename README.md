@@ -2,157 +2,159 @@
 perform airtime topup across all networks, vouchers and zesa recharge with hot-recharge flutter plugin
 
 - ℹ Not an official hot-recharge flutter plugin
+- a flutter plugin port of [hot-recharge python library](https://pypi.org/project/hot-recharge/) and [hot-recharge node package](https://www.npmjs.com/package/hotrecharge)
+
+## screenshots
+![mobile-topup](https://raw.githubusercontent.com/DonnC/hot-recharge-flutter/main/Docs/demo.gif)
 
 ## Plugin installation
-- add hotrecharge to your `pubspec.yaml` file
+- add latest version of `hot_recharge` to your `pubspec.yaml` file
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
 
-  hotrecharge: <latest-version>
+  hot_recharge:
 ```
-
-## [CHANGELOG](CHANGELOG.md)
-please see full [changelog here](CHANGELOG.md)
 
 ## Sign Up
 - needs a hot recharge co-operate account, sign up [here](https://ssl.hot.co.zw/register.aspx)
-- ![sign up](https://github.com/DonnC/Hot-Recharge-ZW/raw/master/Docs/images/signup_cooperate.png)
+- or contact hot-recharge for a proper account
+- ![sign up](https://raw.githubusercontent.com/DonnC/hot-recharge-flutter/main/Docs/images/signup_cooperate.png)
 
 ## Authentication keys
 - `accessCode` := the email address used on registration
 - `accessPswd` := the password of the account used on registration
   
 ```dart
+// import hot-recharge plugin
+import 'package:hot_recharge/hot_recharge.dart';
+
 // create api instance
-api = hotrecharge.HotRecharge(accessCode: '<your-email>', accessPswd: '<your-pwd>');
+hotRecharge = HotRecharge(
+    accessCode: '<your-email>', 
+    accessPswd: '<your-pwd>',
+    enableLogger: false, // flag to true to enable detailed log while testing, use while testing ONLY
+);
 ```
+
+## Features
+- [✔]  perfom airtime topup
+- [✔]  perfom zesa recharge
+- [✔]  query airtime topup transaction
+- [✔]  query zesa transaction
+- [✔]  get account airtime balance
+- [✔]  get account zesa balance
+- [✔]  check zesa customer
+- [❌] perform evd transaction
+- [❌] perform bundle topup
+- `(...)` and more
 
 ## Performing requests
+- all requests returns an instance of `ApiResponse` response model
 - this shows how to perform api requests to hot-recharge services
+
+#### topup number
 ```dart
-import hotrecharge
-import pprint
+// supports both mobile and '08xxxx...' numbers
+final bal = await hotRecharge.topupNumber(1.50, '07xxxxxx');
 
-api = hotrecharge.HotRecharge(headers=credentials)
+// check response status
+if (bal.rechargeResponse == RechargeResponse.SUCCESS) {
+      final PinlessRecharge result = bal.apiResponse;
+      showSnackbar(message: result.replyMsg);
+    }
 
-try:
-    # get wallet balance
-    wallet_bal_response = api.walletBalance()
+    // there was a problem
+    else {
+      showSnackbar(message: 'failed to sent airtime: ${bal.message}');
+    }
 
-    # get end user balance
-    end_user_bal_resp = api.endUserBalance(mobile_number='077xxxxxxx')
-
-    # get data bundles
-    data_bundles_resp = api.getDataBundles()
-
-    print("Wallet Balance: ")
-    pprint.pprint(wallet_bal_response)
-
-    print("End User Balance: ")
-    pprint.pprint(end_user_bal_resp)
-
-    print("Data Bundles Balance: ")
-    pprint.pprint(data_bundles_resp)
-
-except Exception as ex:
-    print(f"There was a problem: {ex}")
 ```
--
-# Recharge
-## Recharge data bundles
-- use bundle product code
-- an optional customer sms can be send together upon request
-- Place holders used include
-```
-%AMOUNT% 	    $XXX.XX
-%COMPANYNAME%	As Defined by Customer on the website www.hot.co.zw
-%ACCESSNAME%	Defined by Customer on website – Teller or Trusted User or branch name
-%BUNDLE%	    Name of the Data Bundle
-```
-```python
-import hotrecharge
-from pprint import pprint
+#### query transaction
+```dart
+// query a previous transaction agent reference for reconcilliation
+final result = await hotRecharge.queryTopupTransaction('previous-agent-reference');
 
-# you can opt to update the reference code manually 
-# by setting `use_random_ref` to False
-api = hotrecharge.HotRecharge(headers=credentials, use_random_ref=False)
+print(result);
 
-try:
-
-    # option message to send to user
-    customer_sms =  " Amount of %AMOUNT% for data %BUNDLE% recharged! " \
-                    " %ACCESSNAME%. The best %COMPANYNAME%!"
-
-    # need to update reference manually, if `use_random_ref` is set to False
-    api.updateReference('<new-random-string>')
-
-    response = api.dataBundleRecharge(product_code="<bundle-product-code>", number="071xxxxxxx", mesg=customer_sms)
-
-    pprint(response)
-
-except Exception as ex:
-    print(f"There was a problem: {ex}")
 ```
 
-### Recharge pinless
-```python
-import hotrecharge
+#### Custom messages
+- the api supports sending `OPTIONAL` custom messages to the user as confirmation messages
+- you can customize how the message will arrive like on the client | user side
+- certain placeholders have to be used and total message length should be less than 150 chars
+- --
+- **For airtime topup**
+  
+custom Message place holders to use and their representation on end user:
+-  `%AMOUNT% - $xxx.xx`
+-  `%INITIALBALANCE% - $xxx.xx`
+- `%FINALBALANCE% - $xxx.xx`
+-  `%TXT% - xxx texts`
+-  `%DATA% - xxx MB`
+-  `%COMPANYNAME% - as defined by Customer on the website www.hot.co.zw`
+-  `%ACCESSNAME% - defined by Customer on website – Teller or Trusted User or branch name`
+  `
 
-api = hotrecharge.HotRecharge(headers=credentials)
+- example
+  ```dart
+  final mesg = 'Recharge of \$ %AMOUNT% is successful.\nThe best %COMPANYNAME%!';
 
-try:
-    customer_sms = "Recharge of %AMOUNT% successful" \
-                   "Initial balance $%INITIALBALANCE%" \
-                   "Final Balance $%FINALBALANCE%" \
-                   "%COMPANYNAME%"
+  var response = await hotRecharge.topupNumber(
+      2.0,
+      '07xxxxxxxx',
+      customMessage: mesg,
+    );
 
-    response = api.rechargePinless(amount=3.5, number="077xxxxxxx", mesg=customer_sms)
-
-    print(response)
-
-except Exception as ex:
-    print(f"There was a problem: {ex}")
-```
-
-# New in `v1.3.0`✨
-- fully implemented method parameters e.g `brandID` and `mesg` for customerSMS on api method calls
-### Query transaction
-- You can now query a previous transaction by its `agentReference` for reconciliation. 
-- It is reccommended to query within the last 30 days of the transaction
-```python
-import hotrecharge
-
-api = hotrecharge.HotRecharge(headers=credentials)
-
-try:
-    response = api.rechargePinless(amount=3.5, number="077xxxxxxx")
-
-    # save agentReference to query for reconciliation
-    prevTransactionAgentReference = response.get("agentReference")
-
-    result = api.queryTransactionReference(prevTransactionAgentReference)
-
-    print(response, result)
-
-except Exception as ex:
-    print(f"There was a problem: {ex}")
-```
-
-## Support 🤿
-- A little support can go a long way
-- You can help by making `PR` on any changes you would like to contribute to
-- `Fork` or `star` this repo, it will help a lot 
+  print(response);
+   ```
+---
+- **For zesa transactions**
+  
+custom Message place holders to use and their representation on end user:
+- `%AMOUNT% - $xxx.xx`
+- `%KWH% - Unit in Kilowatt Hours(Kwh)`
+- `%ACOUNTNAME% - Account holdername of meter number`
+- `%METERNUMBER% - meter number`
+- `%COMPANYNAME% - as defined by Customer on the website www.hot.co.zw`
 
 
 
 ## Note on Zesa Recharges
 ### Requirements 
-A method  for Purchasing ZESA Tokens 
-• It is a ZESA requirement that any purchase must be verified. As such please ensure that you use the `check customer details` method and prompt the customer to confirm the details before calling this method. 
-• There is a new transaction state specifically for ZESA that is Pending verification indicated by reply code 4. Transactions in this state can result in successful transactions after a period of time once ZESA complete transaction. API Users must call Query ZESA method periodically until a permanent resolution of the transaction occurs. This polling of a pending transaction should not exceed more that 4 request a minute. Resending of transactions that have not yet failed can result in the duplication of transaction and lose of funds. 
-Please note ZESA does not allow refunds so the cost of any errors cannot be recovered. 
+- A method  for Purchasing ZESA Tokens 
+- It is a ZESA requirement that any purchase must be **verified**. As such please ensure that you use the `checkCustomerDetail()` method 
+```dart
+    final result = await api.checkZesaCustomer(meterNumber);
+
+    // check response status
+    if (result.rechargeResponse == RechargeResponse.SUCCESS) {
+        ZesaCustomerDetail details = result.apiResponse;
+        var customerInfo = details.customerInfo;
+
+        // prompt for user to verify info obtained from api
+        zesaUserPromptDialog(message: customerInfo.customerName);
+    }
+
+    // there was a problem
+    else {
+      showSnackbar(message: 'failed to check zesa user: ${result.message}');
+    }
+  ```
+
+- and prompt the customer to confirm the details **before** calling this method (`api.rechargeZesa(...)`). 
+- There is a new transaction state specifically for ZESA that is Pending verification indicated by **reply code 4** (`RechargeResponse.PENDING`). Transactions in this state can result in successful transactions after a period of time once ZESA complete transaction.
+- You must call Query ZESA method (`api.queryZesaTransaction(...)`) periodically until a permanent resolution of the transaction occurs. This polling of a pending transaction should not exceed more that **4 request a minute**. Resending of transactions that have not yet failed can result in the duplication of transaction and lose of funds. 
+- Please note ZESA does not allow *refunds* so the cost of any errors cannot be recovered. 
+
+
+## Support 🤿
+- A little support can go a long way
+- You can help by making `PR` on any changes you would like to contribute to
+- `Fork` or `star` this repo, it will help us lot 
+
+- `With 💙 from FlutterDevZW ` by [@DonnC](https://github.com/DonnC) & [@iamngoni](https://github.com/iamngoni)
 
 ## Getting Started
 

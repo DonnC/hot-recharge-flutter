@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+/// response model for a successful pinless recharge (airtime topup to user number)
 class PinlessRecharge {
   final String agentReference;
   final double amount;

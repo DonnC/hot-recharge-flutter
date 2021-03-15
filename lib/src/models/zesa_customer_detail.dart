@@ -3,17 +3,18 @@ import 'dart:convert';
 
 import 'customer_info.dart';
 
+/// get zesa customer details from their meter-number
 class ZesaCustomerDetail {
   final int replyCode;
   final String replyMsg;
-  final int meterNumber;
+  final String meter;
   final String agentReference;
   final CustomerInfo customerInfo;
 
   ZesaCustomerDetail({
     this.replyCode,
     this.replyMsg,
-    this.meterNumber,
+    this.meter,
     this.agentReference,
     this.customerInfo,
   });
@@ -21,14 +22,14 @@ class ZesaCustomerDetail {
   ZesaCustomerDetail copyWith({
     int replyCode,
     String replyMsg,
-    int meterNumber,
+    int meter,
     String agentReference,
     CustomerInfo customerInfo,
   }) {
     return ZesaCustomerDetail(
       replyCode: replyCode ?? this.replyCode,
       replyMsg: replyMsg ?? this.replyMsg,
-      meterNumber: meterNumber ?? this.meterNumber,
+      meter: meter ?? this.meter,
       agentReference: agentReference ?? this.agentReference,
       customerInfo: customerInfo ?? this.customerInfo,
     );
@@ -38,7 +39,7 @@ class ZesaCustomerDetail {
     return {
       'ReplyCode': replyCode,
       'ReplyMsg': replyMsg,
-      'MeterNumber': meterNumber,
+      'Meter': meter,
       'AgentReference': agentReference,
       'CustomerInfo': customerInfo?.toMap(),
     };
@@ -50,7 +51,7 @@ class ZesaCustomerDetail {
     return ZesaCustomerDetail(
       replyCode: map['ReplyCode'],
       replyMsg: map['ReplyMsg'],
-      meterNumber: map['MeterNumber'],
+      meter: map['Meter'],
       agentReference: map['AgentReference'],
       customerInfo: CustomerInfo.fromMap(map['CustomerInfo']),
     );
@@ -63,6 +64,6 @@ class ZesaCustomerDetail {
 
   @override
   String toString() {
-    return 'ZesaCustomerDetail(replyCode: $replyCode, replyMsg: $replyMsg, meterNumber: $meterNumber, agentReference: $agentReference, customerInfo: $customerInfo)';
+    return 'ZesaCustomerDetail(replyCode: $replyCode, replyMsg: $replyMsg, meter: $meter, agentReference: $agentReference, customerInfo: $customerInfo)';
   }
 }

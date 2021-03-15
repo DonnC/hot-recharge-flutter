@@ -2,16 +2,17 @@ import 'dart:convert';
 
 import 'zesa_token.dart';
 
+/// response model on successful zesa recharge
 class ZesaRecharge {
   final int replyCode;
   final String replyMsg;
   final double walletBalance;
   final double amount;
   final double discount;
-  final meter;
+  final String meter;
   final String accountName;
   final String address;
-  final ZesaTokenItem tokens;
+  final List<ZesaTokenItem> tokens;
   final String agentReference;
   final int rechargeID;
 
@@ -38,7 +39,7 @@ class ZesaRecharge {
     String meter,
     String accountName,
     String address,
-    ZesaTokenItem tokens,
+    List<ZesaTokenItem> tokens,
     String agentReference,
     int rechargeID,
   }) {
@@ -67,15 +68,13 @@ class ZesaRecharge {
       'Meter': meter,
       'AccountName': accountName,
       'Address': address,
-      'Tokens': tokens?.toMap(),
+      'Tokens': tokens?.map((x) => x.toMap())?.toList(),
       'AgentReference': agentReference,
       'RechargeID': rechargeID,
     };
   }
 
   factory ZesaRecharge.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return ZesaRecharge(
       replyCode: map['ReplyCode'],
       replyMsg: map['ReplyMsg'],
@@ -85,7 +84,8 @@ class ZesaRecharge {
       meter: map['Meter'],
       accountName: map['AccountName'],
       address: map['Address'],
-      tokens: ZesaTokenItem.fromMap(map['Tokens']),
+      tokens: List<ZesaTokenItem>.from(
+          map['Tokens']?.map((x) => ZesaTokenItem.fromMap(x))),
       agentReference: map['AgentReference'],
       rechargeID: map['RechargeID'],
     );
