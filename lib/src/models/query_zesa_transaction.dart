@@ -1,9 +1,10 @@
 import 'dart:convert';
 
-import 'zesa_token.dart';
+import 'package:hot_recharge/hot_recharge.dart';
 
-/// response model on successful zesa recharge
-class ZesaRecharge {
+/// query zesa transaction success response model
+/// it return same original response [ZesaRecharge] with additional information of [CustomerInfo]
+class QueryZesaTransaction {
   final int replyCode;
   final String replyMsg;
   final double walletBalance;
@@ -15,8 +16,9 @@ class ZesaRecharge {
   final List<ZesaTokenItem> tokens;
   final String agentReference;
   final int rechargeID;
+  final CustomerInfo customerInfo;
 
-  ZesaRecharge({
+  QueryZesaTransaction({
     this.replyCode,
     this.replyMsg,
     this.walletBalance,
@@ -28,9 +30,10 @@ class ZesaRecharge {
     this.tokens,
     this.agentReference,
     this.rechargeID,
+    this.customerInfo,
   });
 
-  ZesaRecharge copyWith({
+  QueryZesaTransaction copyWith({
     int replyCode,
     String replyMsg,
     double walletBalance,
@@ -42,8 +45,9 @@ class ZesaRecharge {
     List<ZesaTokenItem> tokens,
     String agentReference,
     int rechargeID,
+    ZesaCustomerDetail customerInfo,
   }) {
-    return ZesaRecharge(
+    return QueryZesaTransaction(
       replyCode: replyCode ?? this.replyCode,
       replyMsg: replyMsg ?? this.replyMsg,
       walletBalance: walletBalance ?? this.walletBalance,
@@ -55,6 +59,7 @@ class ZesaRecharge {
       tokens: tokens ?? this.tokens,
       agentReference: agentReference ?? this.agentReference,
       rechargeID: rechargeID ?? this.rechargeID,
+      customerInfo: customerInfo ?? this.customerInfo,
     );
   }
 
@@ -71,11 +76,12 @@ class ZesaRecharge {
       'Tokens': tokens?.map((x) => x.toMap())?.toList(),
       'AgentReference': agentReference,
       'RechargeID': rechargeID,
+      'CustomerInfo': customerInfo.toMap(),
     };
   }
 
-  factory ZesaRecharge.fromMap(Map<String, dynamic> map) {
-    return ZesaRecharge(
+  factory QueryZesaTransaction.fromMap(Map<String, dynamic> map) {
+    return QueryZesaTransaction(
       replyCode: map['ReplyCode'],
       replyMsg: map['ReplyMsg'],
       walletBalance: map['WalletBalance'],
@@ -88,16 +94,17 @@ class ZesaRecharge {
           map['Tokens']?.map((x) => ZesaTokenItem.fromMap(x))),
       agentReference: map['AgentReference'],
       rechargeID: map['RechargeID'],
+      customerInfo: CustomerInfo.fromMap(map['CustomerInfo']),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory ZesaRecharge.fromJson(String source) =>
-      ZesaRecharge.fromMap(json.decode(source));
+  factory QueryZesaTransaction.fromJson(String source) =>
+      QueryZesaTransaction.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'ZesaRecharge(replyCode: $replyCode, replyMsg: $replyMsg, walletBalance: $walletBalance, amount: $amount, discount: $discount, meter: $meter, accountName: $accountName, address: $address, tokens: $tokens, agentReference: $agentReference, rechargeID: $rechargeID)';
+    return 'QueryZesaTransaction(replyCode: $replyCode, replyMsg: $replyMsg, walletBalance: $walletBalance, amount: $amount, discount: $discount, meter: $meter, accountName: $accountName, address: $address, tokens: $tokens, agentReference: $agentReference, rechargeID: $rechargeID, customerInfo: $customerInfo)';
   }
 }

@@ -30,55 +30,124 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController amountController;
+  TextEditingController phoneController;
   HotRecharge hotRecharge;
+
+  bool loading = false;
+
+  // can add custom message to sent to user
+  final mesg =
+      'Recharge of \$ %AMOUNT% is successful.\nThe best %COMPANYNAME%!';
 
   @override
   void initState() {
     setupHR();
+    amountController = TextEditingController();
+    phoneController = TextEditingController();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    phoneController.dispose();
+    super.dispose();
+  }
+
+  void showSnackbar(String message, Color color) {
+    scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        backgroundColor: color,
+        content: Text(message),
+      ),
+    );
   }
 
   void setupHR() {
     hotRecharge = HotRecharge(
       accessCode: '<your-acc-email>',
       accessPswd: '<your-acc-pswd>',
-      enableLogger:
-          true, // enable detailed request logger on console. Use while TESTING only
+      //enableLogger: true, // enable detailed request logger on console. Use while TESTING only
     );
   }
 
-  void _incrementCounter() {
+  Future<void> rechargeNumber() async {
     setState(() {
-      _counter++;
+      loading = true;
+    });
+
+    var response = await hotRecharge.topupNumber(
+      double.parse(amountController.text),
+      phoneController.text,
+      customMessage: mesg,
+    );
+
+    if (response.rechargeResponse == RechargeResponse.SUCCESS) {
+      final PinlessRecharge result = response.apiResponse;
+      showSnackbar(result.replyMsg, Colors.green);
+    }
+
+    // there was a problem
+    else {
+      showSnackbar('failed to sent airtime: ${response.message}', Colors.red);
+    }
+
+    setState(() {
+      loading = false;
+      phoneController.clear();
+      amountController.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(15),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            TextField(
+              controller: phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                labelText: 'Number to recharge',
+                hintText: '07xxxxxx.. or 08xxxxx..',
+                hintStyle: TextStyle(
+                  color: Colors.grey,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            SizedBox(height: 30),
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.numberWithOptions(
+                signed: true,
+                decimal: true,
+              ),
+              decoration: InputDecoration(
+                labelText: 'Amount to recharge',
+              ),
             ),
+            SizedBox(height: 30),
+            loading
+                ? CircularProgressIndicator()
+                : FlatButton(
+                    color: Colors.blue,
+                    onPressed: () async => await rechargeNumber(),
+                    child: Text(
+                      'Recharge',
+                    ),
+                  ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }

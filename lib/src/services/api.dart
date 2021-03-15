@@ -1,22 +1,11 @@
-/*
-  Hot Recharge Flutter Api Library
-  __author__  Donald Chinhuru | Ngonidzashe Mangudya
-  __version__ 1.0.0
-  __name__    Hot Recharge
-
-  @created: 17 Feb 2021
-
-  a python port for hot-recharge library
-*/
-
 import 'dart:async';
 import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:hot_recharge/src/models/index.dart';
-import 'package:hot_recharge/src/utils.dart';
+import '../../hot_recharge.dart';
+import '../utils.dart';
 
 class Api {
   static const String _ROOT_ENDPOINT = "https://ssl.hot.co.zw";
@@ -123,7 +112,7 @@ class Api {
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
 
       _log('raw topup wallet balance response: $data', LOG_LEVEL.DEBUG);
 
@@ -141,7 +130,9 @@ class Api {
       _log(data, LOG_LEVEL.WARNING);
 
       return ApiResponse(
-        message: 'wallet balance failed',
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'wallet balance failed',
         rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
@@ -171,7 +162,7 @@ class Api {
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
 
       _log('zesa wallet balance response: $data', LOG_LEVEL.DEBUG);
 
@@ -189,7 +180,9 @@ class Api {
       _log(data, LOG_LEVEL.WARNING);
 
       return ApiResponse(
-        message: 'zesa wallet balance failed',
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'zesa wallet balance failed',
         rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
@@ -220,7 +213,7 @@ class Api {
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
 
       _log('query topup transaction response: $data', LOG_LEVEL.DEBUG);
 
@@ -238,7 +231,9 @@ class Api {
       _log(data, LOG_LEVEL.WARNING);
 
       return ApiResponse(
-        message: 'query transaction failed',
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'query transaction failed',
         rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
@@ -255,27 +250,6 @@ class Api {
     }
   }
 
-  /// recharge a mobile number, number can be any supported zim number 07xxx.. or landline 08...
-  /// brandID - Optional:
-  /// customMessage - Optional, customised sms to send to user upon topup, 135 chars max
-  ///      custom Message place holders to use and their representation on end user:
-  ///      %AMOUNT% - $xxx.xx
-  ///      %INITIALBALANCE% - $xxx.xx
-  ///      %FINALBALANCE% - $xxx.xx
-  ///      %TXT% - xxx texts
-  ///      %DATA% - xxx MB
-  ///      %COMPANYNAME% - as defined by Customer on the website www.hot.co.zw
-  ///      %ACCESSNAME% - defined by Customer on website – Teller or Trusted User or branch name
-  ///
-  /// ```dart
-  /// final custom_message = """
-  ///   Your recharge of \$ %AMOUNT% is successful.
-  ///   Your final airtime bal: \$ %FINALBALANCE%.
-  ///   Thank you for using %COMPANYNAME%
-  /// """;
-  /// var resp = api.rechargePinless(2.5, '07xxxxxxxx', customMessage: custom_message);
-  /// ```
-  /// return: [ApiResponse]
   Future<ApiResponse> rechargePinless(
     double amount,
     String contact, {
@@ -317,7 +291,7 @@ class Api {
 
       _headers['Content-type'] = _MIME_TYPES;
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
 
       _log('topup number response: $data', LOG_LEVEL.DEBUG);
 
@@ -335,7 +309,9 @@ class Api {
       _log(data, LOG_LEVEL.WARNING);
 
       return ApiResponse(
-        message: 'pinless recharge failed',
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'pinless recharge failed',
         rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
@@ -383,7 +359,7 @@ class Api {
 
       _headers['Content-type'] = _MIME_TYPES;
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
 
       _log('query zesa customer response: $data', LOG_LEVEL.DEBUG);
 
@@ -401,7 +377,9 @@ class Api {
       _log(data, LOG_LEVEL.WARNING);
 
       return ApiResponse(
-        message: 'check zesa customer failed',
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'check zesa customer failed',
         rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
@@ -439,7 +417,7 @@ class Api {
       }
 
       if (contact.startsWith('07')) {
-        payload['TargetMobile'] = contact;
+        payload['TargetNumber'] = contact;
       }
 
       _log('zesa recharge payload: $payload', LOG_LEVEL.INFO);
@@ -456,7 +434,7 @@ class Api {
 
       _headers['Content-type'] = _MIME_TYPES;
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
 
       _log('zesa recharge response: $data', LOG_LEVEL.DEBUG);
 
@@ -483,7 +461,9 @@ class Api {
       _log(data, LOG_LEVEL.WARNING);
 
       return ApiResponse(
-        message: 'zesa recharge failed',
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'zesa recharge failed',
         rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
@@ -500,7 +480,7 @@ class Api {
     }
   }
 
-  Future<ApiResponse> queryZesaTransaction(String rechargeId) async {
+  Future<ApiResponse> queryZesaTransaction(int rechargeId) async {
     _autoUpdateReference();
 
     _log('making request for: query zesa transaction', LOG_LEVEL.INFO);
@@ -512,29 +492,31 @@ class Api {
 
       var response = await http.post(
         url,
-        body: {"RechargeId": rechargeId},
+        body: {"RechargeId": rechargeId.toString()},
         headers: this._headers,
       );
 
-      var data = jsonDecode(response.body);
+      var data = jsonDecode(response.body) as Map;
 
       _headers['Content-type'] = _MIME_TYPES;
 
       _log('query zesa transaction response: $data', LOG_LEVEL.DEBUG);
 
-      if (data['ReplyCode'] == '2') {
+      if (data['ReplyCode'] == 2) {
         // success
-        // TODO: Return proper model
+        final QueryZesaTransaction qzt = QueryZesaTransaction.fromMap(data);
 
         return ApiResponse(
           message: 'query zesa transaction success',
           rechargeResponse: RechargeResponse.SUCCESS,
-          apiResponse: data,
+          apiResponse: qzt,
         );
       }
 
       return ApiResponse(
-        message: 'query zesa transaction failed',
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'query zesa transaction failed',
         rechargeResponse: RechargeResponse.API_ERROR,
         apiResponse: data,
       );
@@ -550,4 +532,16 @@ class Api {
       );
     }
   }
+}
+
+
+/// used internally when `enableLogger` is set to true
+/// used to determine log level
+enum LOG_LEVEL {
+  DEBUG,
+  INFO,
+  ERROR,
+  WARNING,
+  WTF,
+  LOG,
 }

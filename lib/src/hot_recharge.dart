@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'models/index.dart';
 import 'services/api.dart';
 
-/// connect to hot-recharge and perfom airtime topup and zesa recharge 
+/// connect to hot-recharge and perfom airtime topup and zesa recharge
 class HotRecharge {
   // hot-recharge account email
   final String accessCode;
@@ -60,8 +60,8 @@ class HotRecharge {
   }
 
   /// recharge a mobile number, number can be any supported zim number 07xxx.. or 08...
-  /// brandID - Optional:
-  /// customMessage - Optional, customised sms to send to user upon topup, 135 chars max
+  /// brandID - (Optional)
+  /// customMessage - (Optional), customised sms to send to user upon topup, 135 chars max
   ///      custom Message place holders to use and their representation on end user:
   ///      %AMOUNT% - $xxx.xx
   ///      %INITIALBALANCE% - $xxx.xx
@@ -156,7 +156,7 @@ class HotRecharge {
   /// also very useful for querying zesa recharge transactions for [ApiResponse] rechargeResponse -> [RechargeResponse.PENDING]
   /// very useful when `rechargeZesa(...)` returns  [RechargeResponse.PENDING]. Its reccommended not to perform a recharge again but poll this query until transaction status is success
   /// refer to Docs for more
-  Future<ApiResponse> queryZesaTransaction(String rechargeId) async {
+  Future<ApiResponse> queryZesaTransaction(int rechargeId) async {
     final queryZesa = _api.queryZesaTransaction(rechargeId);
 
     return queryZesa;

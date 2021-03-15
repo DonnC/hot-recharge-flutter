@@ -3,11 +3,11 @@ import 'dart:convert';
 /// zesa token item model, a property in [ZesaRecharge] -> tokens
 class ZesaTokenItem {
   final String token;
-  final String units;
-  final String netAmount;
-  final String levy;
-  final String arrears;
-  final String taxAmount;
+  final double units;
+  final double netAmount;
+  final double levy;
+  final double arrears;
+  final double taxAmount;
   final String zesaReference;
 
   ZesaTokenItem({
