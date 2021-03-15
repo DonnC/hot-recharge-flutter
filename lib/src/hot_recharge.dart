@@ -162,12 +162,13 @@ class HotRecharge {
     return queryZesa;
   }
 
+  /// Query airtime balance for a specific user using their mobile number
   Future<ApiResponse> endUserBalance (String mobileNumber) async{
+    /// If mobile number is not provided throw exception
     if (mobileNumber.isEmpty) {
       throw new Exception("Mobile Number cannot be empty");
     }
 
-    final balance = await _api.endUserBalance(mobileNumber);
-    return balance;
+    return await _api.endUserBalance(mobileNumber);
   }
 }

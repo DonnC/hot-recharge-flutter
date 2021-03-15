@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:hot_recharge/src/models/end_user_balance.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
@@ -540,10 +541,9 @@ class Api {
     try {
       String url =
           _ROOT_ENDPOINT + _API_VERSION + _END_USER_BALANCE + mobileNumber;
+      print(url);
       response = await http.get(url, headers: this._headers);
-
-      var data = json.decode(response.body);
-      return data;
+      return ApiResponse(apiResponse: EndUserBalance.fromJson(response.body), message: 'Success!', rechargeResponse: RechargeResponse.SUCCESS);
     } catch (e) {
       return ApiResponse(
         rechargeResponse: RechargeResponse.ERROR,
@@ -552,7 +552,6 @@ class Api {
     }
   }
 }
-
 
 /// used internally when `enableLogger` is set to true
 /// used to determine log level
