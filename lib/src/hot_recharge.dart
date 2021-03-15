@@ -137,4 +137,13 @@ class HotRecharge {
 
     return queryZesa;
   }
+
+  Future<ApiResponse> endUserBalance (String mobileNumber) async{
+    if (mobileNumber.isEmpty) {
+      throw new Exception("Mobile Number cannot be empty");
+    }
+
+    final balance = await _api.endUserBalance(mobileNumber);
+    return balance;
+  }
 }

@@ -26,9 +26,11 @@ class Api {
   static const String _WALLET_BALANCE = "agents/wallet-balance";
   static const String _ZESA_BALANCE = 'agents/wallet-balance-zesa';
   static const String _CHECK_ZESA_CUSTOMER = "agents/check-customer-zesa";
-  static const String _QUERY_TRANSACTION = "agents/query-transaction?agentReference=";
+  static const String _QUERY_TRANSACTION =
+      "agents/query-transaction?agentReference=";
   static const String _QUERY_ZESA = "agents/query-zesa-transaction";
-  static const String _END_USER_BALANCE = "agents/enduser-balance?targetmobile=";
+  static const String _END_USER_BALANCE =
+      "agents/enduser-balance?targetmobile=";
 
   final String email;
   final String pswd;
@@ -66,7 +68,10 @@ class Api {
   /// update x-agent-reference automatically
   /// api requires that each request have a unique agent-reference
   void _autoUpdateReference() {
-    this._headers.update('x-agent-reference', (value) => this._generateReference(),);
+    this._headers.update(
+          'x-agent-reference',
+          (value) => this._generateReference(),
+        );
   }
 
   Future<ApiResponse> getWalletBalance() async {
@@ -425,17 +430,21 @@ class Api {
     }
   }
 
-  Future<ApiResponse> endUserBalance (String mobileNumber) async{
+  Future<ApiResponse> endUserBalance(String mobileNumber) async {
     this._autoUpdateReference();
     http.Response response;
     try {
-      String url = _ROOT_ENDPOINT + _API_VERSION + _END_USER_BALANCE + mobileNumber;
+      String url =
+          _ROOT_ENDPOINT + _API_VERSION + _END_USER_BALANCE + mobileNumber;
       response = await http.get(url, headers: this._headers);
 
       var data = json.decode(response.body);
-      print(data);
+      return data;
     } catch (e) {
-      return ApiResponse(statusresponse: RECHARGERESPONSE.ERROR, message: e.toString(),);
+      return ApiResponse(
+        statusresponse: RECHARGERESPONSE.ERROR,
+        message: e.toString(),
+      );
     }
   }
 }

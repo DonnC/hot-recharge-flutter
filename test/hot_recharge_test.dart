@@ -5,15 +5,11 @@ import 'package:hot_recharge/hot_recharge.dart';
 void main() async {
   test('get topup wallet balance: return ApiResponse instance', () async {
     final api = HotRecharge(
-      accessCode: '',
-      accessPswd: '',
+      accessCode: 'imngonii@gmail.com',
+      accessPswd: 'Nickm@ng13',
     );
 
-    final bal = await api.topupWalletBalance();
-
-    print(bal.apiResponse);
-    print(bal.message);
-    print(bal.statusresponse);
+    final bal = await api.endUserBalance("0777213388");
 
     expect(bal, isInstanceOf<ApiResponse>());
   });
