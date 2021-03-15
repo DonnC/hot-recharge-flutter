@@ -139,13 +139,15 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 30),
             loading
                 ? CircularProgressIndicator()
-                : FlatButton(
-                    color: Colors.blue,
-                    onPressed: () async => await rechargeNumber(),
-                    child: Text(
-                      'Recharge',
+                : Container(
+                  color: Colors.blue,
+                  child: TextButton(
+                      onPressed: () async => await rechargeNumber(),
+                      child: Text(
+                        'Recharge',
+                      ),
                     ),
-                  ),
+                ),
           ],
         ),
       ),
