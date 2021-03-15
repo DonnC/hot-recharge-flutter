@@ -5,7 +5,7 @@ perform airtime topup across all networks, vouchers and zesa recharge with hot-r
 - a flutter plugin port of [hot-recharge python library](https://pypi.org/project/hot-recharge/) and [hot-recharge node package](https://www.npmjs.com/package/hotrecharge)
 
 ## screenshots
-[mobile-topup](https://raw.githubusercontent.com/DonnC/hot-recharge-flutter/main/Docs/hr.gif)
+![mobile-topup](https://raw.githubusercontent.com/DonnC/hot-recharge-flutter/main/Docs/demo.gif)
 
 ## Plugin installation
 - add latest version of `hot_recharge` to your `pubspec.yaml` file
