@@ -541,7 +541,6 @@ class Api {
     try {
       String url =
           _ROOT_ENDPOINT + _API_VERSION + _END_USER_BALANCE + mobileNumber;
-      print(url);
       response = await http.get(url, headers: this._headers);
       return ApiResponse(apiResponse: EndUserBalance.fromJson(response.body), message: 'Success!', rechargeResponse: RechargeResponse.SUCCESS);
     } catch (e) {
