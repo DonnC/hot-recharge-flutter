@@ -164,7 +164,7 @@ class HotRecharge {
   }
 
   /// Query airtime balance for a specific user using their mobile number
-  Future<ApiResponse> endUserBalance(String mobileNumber) async {
+  Future<ApiResponse> _endUserBalance(String mobileNumber) async {
     final userBalance = _api.endUserBalance(mobileNumber);
     return userBalance;
   }
