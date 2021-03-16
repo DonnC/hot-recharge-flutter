@@ -541,12 +541,30 @@ class Api {
       String url =
           _ROOT_ENDPOINT + _API_VERSION + _END_USER_BALANCE + mobileNumber;
       response = await http.get(url, headers: this._headers);
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('End user airtime balance response: $data', LOG_LEVEL.DEBUG);
+
+      if (data['ReplyCode'] == 2) {
+        EndUserBalance eub = EndUserBalance.fromMap(data);
+
+        return ApiResponse(
+          apiResponse: eub,
+          message: 'Success!',
+          rechargeResponse: RechargeResponse.SUCCESS,
+        );
+      }
+
       return ApiResponse(
-        apiResponse: EndUserBalance.fromJson(response.body),
-        message: 'Success!',
-        rechargeResponse: RechargeResponse.SUCCESS,
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'Retrieving balance failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
+        apiResponse: data,
       );
     } catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
       return ApiResponse(
         rechargeResponse: RechargeResponse.ERROR,
         message: e.toString(),
