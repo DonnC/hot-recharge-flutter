@@ -536,6 +536,17 @@ class Api {
 
   Future<ApiResponse> endUserBalance(String mobileNumber) async {
     this._autoUpdateReference();
+
+    if (mobileNumber.isEmpty) {
+      _log(
+        'Mobile number cannot be empty: $mobileNumber',
+        LOG_LEVEL.ERROR,
+      );
+      return ApiResponse(
+        message: 'Mobile number is required!',
+        rechargeResponse: RechargeResponse.ERROR,
+      );
+    }
     http.Response response;
     try {
       String url =

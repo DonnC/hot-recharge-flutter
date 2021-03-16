@@ -33,6 +33,16 @@ void main() async {
       expect(bal, isInstanceOf<ApiResponse>());
     });
 
+    test('End-user Airtime Balance : return ApiResponse instance', () async {
+      final bal = await api.endUserBalance(numberToTopup);
+
+      print(bal.apiResponse);
+      print(bal.message);
+      print(bal.rechargeResponse);
+
+      expect(bal, isInstanceOf<ApiResponse>());
+    });
+
 // TODO: Run this wisely (maybe once | twice with minimum amount) to save your testing account balance
     test('topup user account : return ApiResponse instance', () async {
       final bal = await api.topupNumber(topupAmount, numberToTopup);
@@ -105,15 +115,5 @@ void main() async {
 
       expect(bal, isInstanceOf<ApiResponse>());
     });
-  });
-
-  test('End-user Airtime Balance : return ApiResponse instance', () async {
-    final bal = await api.endUserBalance(numberToTopup);
-
-    print(bal.apiResponse);
-    print(bal.message);
-    print(bal.rechargeResponse);
-
-    expect(bal, isInstanceOf<ApiResponse>());
   });
 }

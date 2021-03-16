@@ -165,14 +165,7 @@ class HotRecharge {
 
   /// Query airtime balance for a specific user using their mobile number
   Future<ApiResponse> endUserBalance(String mobileNumber) async {
-    /// If mobile number is not provided throw exception
-    if (mobileNumber.isEmpty) {
-      return ApiResponse(
-        message: 'Mobile number is required!',
-        rechargeResponse: RechargeResponse.ERROR,
-      );
-    }
-
-    return await _api.endUserBalance(mobileNumber);
+    final userBalance = _api.endUserBalance(mobileNumber);
+    return userBalance;
   }
 }
