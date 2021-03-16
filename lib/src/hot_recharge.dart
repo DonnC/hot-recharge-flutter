@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:hot_recharge/hot_recharge.dart';
 
 import 'models/index.dart';
 import 'services/api.dart';
@@ -160,5 +161,11 @@ class HotRecharge {
     final queryZesa = _api.queryZesaTransaction(rechargeId);
 
     return queryZesa;
+  }
+
+  /// Query airtime balance for a specific user using their mobile number
+  Future<ApiResponse> _endUserBalance(String mobileNumber) async {
+    final userBalance = _api.endUserBalance(mobileNumber);
+    return userBalance;
   }
 }

@@ -9,3 +9,4 @@ export 'zesa_customer_detail.dart';
 export 'zesa_recharge.dart';
 export 'zesa_token.dart';
 export 'zesa_wallet_balance.dart';
+export 'end_user_balance.dart';

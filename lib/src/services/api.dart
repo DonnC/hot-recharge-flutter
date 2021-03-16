@@ -14,7 +14,6 @@ class Api {
 
   // endpoints definition
   static const String _RECHARGE_PINLESS = "agents/recharge-pinless";
-
   static const String _RECHARGE_ZESA = "agents/recharge-zesa";
   static const String _WALLET_BALANCE = "agents/wallet-balance";
   static const String _ZESA_BALANCE = 'agents/wallet-balance-zesa';
@@ -22,6 +21,8 @@ class Api {
   static const String _QUERY_TRANSACTION =
       "agents/query-transaction?agentReference=";
   static const String _QUERY_ZESA = "agents/query-zesa-transaction";
+  static const String _END_USER_BALANCE =
+      "agents/enduser-balance?targetmobile=";
 
   var logger = Logger(
     printer: PrettyPrinter(),
@@ -107,7 +108,7 @@ class Api {
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _WALLET_BALANCE;
 
-      var response = await http.get(
+      http.Response response = await http.get(
         url,
         headers: this._headers,
       );
@@ -157,7 +158,7 @@ class Api {
     try {
       String url = _ROOT_ENDPOINT + _API_VERSION + _ZESA_BALANCE;
 
-      var response = await http.get(
+      http.Response response = await http.get(
         url,
         headers: this._headers,
       );
@@ -208,7 +209,7 @@ class Api {
       String url =
           _ROOT_ENDPOINT + _API_VERSION + _QUERY_TRANSACTION + agentReference;
 
-      var response = await http.get(
+      http.Response response = await http.get(
         url,
         headers: this._headers,
       );
@@ -283,7 +284,7 @@ class Api {
 
       _headers.remove('Content-type');
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: payload,
         headers: this._headers,
@@ -349,7 +350,7 @@ class Api {
 
       _headers.remove('Content-type');
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: {
           'MeterNumber': meterNumber,
@@ -426,7 +427,7 @@ class Api {
 
       _headers.remove('Content-type');
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: payload,
         headers: this._headers,
@@ -490,7 +491,7 @@ class Api {
 
       _headers.remove('Content-type');
 
-      var response = await http.post(
+      http.Response response = await http.post(
         url,
         body: {"RechargeId": rechargeId.toString()},
         headers: this._headers,
@@ -532,8 +533,56 @@ class Api {
       );
     }
   }
-}
 
+  Future<ApiResponse> endUserBalance(String mobileNumber) async {
+    this._autoUpdateReference();
+
+    if (mobileNumber.isEmpty) {
+      _log(
+        'Mobile number cannot be empty: $mobileNumber',
+        LOG_LEVEL.ERROR,
+      );
+      return ApiResponse(
+        message: 'Mobile number is required!',
+        rechargeResponse: RechargeResponse.ERROR,
+      );
+    }
+    http.Response response;
+    try {
+      String url =
+          _ROOT_ENDPOINT + _API_VERSION + _END_USER_BALANCE + mobileNumber;
+      response = await http.get(url, headers: this._headers);
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('End user airtime balance response: $data', LOG_LEVEL.DEBUG);
+
+      if (data['ReplyCode'] == 2) {
+        EndUserBalance eub = EndUserBalance.fromMap(data);
+
+        return ApiResponse(
+          apiResponse: eub,
+          message: 'Success!',
+          rechargeResponse: RechargeResponse.SUCCESS,
+        );
+      }
+
+      return ApiResponse(
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'Retrieving balance failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
+        apiResponse: data,
+      );
+    } catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+      return ApiResponse(
+        rechargeResponse: RechargeResponse.ERROR,
+        message: e.toString(),
+      );
+    }
+  }
+}
 
 /// used internally when `enableLogger` is set to true
 /// used to determine log level

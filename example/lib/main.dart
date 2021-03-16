@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void showSnackbar(String message, Color color) {
-    scaffoldKey.currentState.showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: color,
         content: Text(message),
@@ -139,11 +139,13 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 30),
             loading
                 ? CircularProgressIndicator()
-                : FlatButton(
+                : Container(
                     color: Colors.blue,
-                    onPressed: () async => await rechargeNumber(),
-                    child: Text(
-                      'Recharge',
+                    child: TextButton(
+                      onPressed: () async => await rechargeNumber(),
+                      child: Text(
+                        'Recharge',
+                      ),
                     ),
                   ),
           ],
