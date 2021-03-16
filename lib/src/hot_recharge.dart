@@ -168,8 +168,9 @@ class HotRecharge {
     /// If mobile number is not provided throw exception
     if (mobileNumber.isEmpty) {
       return ApiResponse(
-          message: 'Mobile number is required!',
-          rechargeResponse: RechargeResponse.ERROR);
+        message: 'Mobile number is required!',
+        rechargeResponse: RechargeResponse.ERROR,
+      );
     }
 
     return await _api.endUserBalance(mobileNumber);
