@@ -151,6 +151,7 @@ custom Message place holders to use and their representation on end user:
 
 ## Support 🤿
 - A little support can go a long way
+- For general questions and discussions please make use of [github discussions here](https://github.com/DonnC/hot-recharge-flutter/discussions)
 - You can help by making `PR` on any changes you would like to contribute to
 - `Fork` or `star` this repo, it will help us lot 
 
