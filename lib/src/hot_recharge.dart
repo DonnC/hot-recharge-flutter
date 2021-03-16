@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:hot_recharge/hot_recharge.dart';
 
 import 'models/index.dart';
 import 'services/api.dart';
@@ -163,10 +164,12 @@ class HotRecharge {
   }
 
   /// Query airtime balance for a specific user using their mobile number
-  Future<ApiResponse> endUserBalance (String mobileNumber) async{
+  Future<ApiResponse> endUserBalance(String mobileNumber) async {
     /// If mobile number is not provided throw exception
     if (mobileNumber.isEmpty) {
-      throw new Exception("Mobile Number cannot be empty");
+      return ApiResponse(
+          message: 'Mobile number is required!',
+          rechargeResponse: RechargeResponse.ERROR);
     }
 
     return await _api.endUserBalance(mobileNumber);

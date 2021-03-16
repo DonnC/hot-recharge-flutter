@@ -108,12 +108,12 @@ void main() async {
   });
 
   test('End-user Airtime Balance : return ApiResponse instance', () async {
-      final bal = await api.endUserBalance(numberToTopup);
+    final bal = await api.endUserBalance(numberToTopup);
 
-      print(bal.apiResponse);
-      print(bal.message);
-      print(bal.rechargeResponse);
+    print(bal.apiResponse);
+    print(bal.message);
+    print(bal.rechargeResponse);
 
-      expect(bal, isInstanceOf<ApiResponse>());
-    });
+    expect(bal, isInstanceOf<ApiResponse>());
+  });
 }

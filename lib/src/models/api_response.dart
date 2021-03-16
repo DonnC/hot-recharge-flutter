@@ -18,5 +18,6 @@ class ApiResponse {
   });
 
   @override
-  String toString() => 'ApiResponse(rechargeResponse: $rechargeResponse, apiResponse: $apiResponse, message: $message)';
+  String toString() =>
+      'ApiResponse(rechargeResponse: $rechargeResponse, apiResponse: $apiResponse, message: $message)';
 }

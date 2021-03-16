@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:hot_recharge/src/models/end_user_balance.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
@@ -542,7 +541,11 @@ class Api {
       String url =
           _ROOT_ENDPOINT + _API_VERSION + _END_USER_BALANCE + mobileNumber;
       response = await http.get(url, headers: this._headers);
-      return ApiResponse(apiResponse: EndUserBalance.fromJson(response.body), message: 'Success!', rechargeResponse: RechargeResponse.SUCCESS);
+      return ApiResponse(
+        apiResponse: EndUserBalance.fromJson(response.body),
+        message: 'Success!',
+        rechargeResponse: RechargeResponse.SUCCESS,
+      );
     } catch (e) {
       return ApiResponse(
         rechargeResponse: RechargeResponse.ERROR,
