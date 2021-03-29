@@ -14,7 +14,9 @@ class Api {
 
   // endpoints definition
   static const String _RECHARGE_PINLESS = "agents/recharge-pinless";
-
+  static const String _QUERY_EVD = "agents/query-evd";
+  static const String _GET_DATA_BUNDLES = "agents/get-data-bundles";
+  static const String _RECHARGE_BUNDLE = "agents/recharge-data";
   static const String _RECHARGE_ZESA = "agents/recharge-zesa";
   static const String _WALLET_BALANCE = "agents/wallet-balance";
   static const String _ZESA_BALANCE = 'agents/wallet-balance-zesa';
@@ -22,6 +24,8 @@ class Api {
   static const String _QUERY_TRANSACTION =
       "agents/query-transaction?agentReference=";
   static const String _QUERY_ZESA = "agents/query-zesa-transaction";
+  static const String _RECHARGE_EVD = "agents/recharge-evd";
+  static const String _BULK_RECHARGE_EVD = "agents/bulk-evd";
 
   var logger = Logger(
     printer: PrettyPrinter(),
@@ -97,6 +101,322 @@ class Api {
           'x-agent-reference',
           (value) => this._generateReference(),
         );
+  }
+
+  Future<ApiResponse> getDataBundles() async {
+    _autoUpdateReference();
+
+    _log('making request for: get data bundles', LOG_LEVEL.INFO);
+
+    try {
+      String url = _ROOT_ENDPOINT + _API_VERSION + _GET_DATA_BUNDLES;
+
+      var response = await http.get(
+        url,
+        headers: this._headers,
+      );
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('raw data bundles response: $data', LOG_LEVEL.DEBUG);
+
+      if (data['ReplyCode'] == 2) {
+        // success
+        DataBundles db = DataBundles.fromMap(data);
+
+        return ApiResponse(
+          message: 'data bundle success',
+          rechargeResponse: RechargeResponse.SUCCESS,
+          apiResponse: db,
+        );
+      }
+
+      _log(data, LOG_LEVEL.WARNING);
+
+      return ApiResponse(
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'get data bundles failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
+        apiResponse: data,
+      );
+    }
+
+    // error
+    catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
+      return ApiResponse(
+        rechargeResponse: RechargeResponse.ERROR,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> queryEVD() async {
+    _autoUpdateReference();
+
+    _log('making request for: query evd', LOG_LEVEL.INFO);
+
+    try {
+      String url = _ROOT_ENDPOINT + _API_VERSION + _QUERY_EVD;
+
+      var response = await http.get(
+        url,
+        headers: this._headers,
+      );
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('raw query evd response: $data', LOG_LEVEL.DEBUG);
+
+      if (data['ReplyCode'] == 2) {
+        // success
+        QueryEvd qe = QueryEvd.fromMap(data);
+
+        return ApiResponse(
+          message: 'query evd success',
+          rechargeResponse: RechargeResponse.SUCCESS,
+          apiResponse: qe,
+        );
+      }
+
+      _log(data, LOG_LEVEL.WARNING);
+
+      return ApiResponse(
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'query evd failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
+        apiResponse: data,
+      );
+    }
+
+    // error
+    catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
+      return ApiResponse(
+        rechargeResponse: RechargeResponse.ERROR,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> bulkPurchaseEvd(
+    String brandID,
+    double pinValue,
+    int quantity,
+  ) async {
+    _autoUpdateReference();
+
+    _log('making request for: bulkd evd recharge', LOG_LEVEL.INFO);
+
+    try {
+      Map<String, dynamic> payload = Map<String, dynamic>();
+
+      payload['BrandID'] = brandID;
+      payload['Denomination'] = pinValue.toString();
+      payload['Quantity'] = quantity.toString();
+
+      _log('bulk evd recharge payload: $payload', LOG_LEVEL.INFO);
+
+      String url = _ROOT_ENDPOINT + _API_VERSION + _BULK_RECHARGE_EVD;
+
+      _headers.remove('Content-type');
+
+      var response = await http.post(
+        url,
+        body: payload,
+        headers: this._headers,
+      );
+
+      _headers['Content-type'] = _MIME_TYPES;
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('bulk evd recharge response: $data', LOG_LEVEL.DEBUG);
+
+      if (data['ReplyCode'] == 2) {
+        // success
+        //BundleRecharge br = BundleRecharge.fromJson(response.body);
+
+        return ApiResponse(
+          message: 'bulk evd recharge success',
+          rechargeResponse: RechargeResponse.SUCCESS,
+          apiResponse: response.body,
+        );
+      }
+
+      _log(data, LOG_LEVEL.WARNING);
+
+      return ApiResponse(
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'bulk evd recharge failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
+        apiResponse: data,
+      );
+    }
+
+    // error
+    catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
+      return ApiResponse(
+        rechargeResponse: RechargeResponse.ERROR,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> rechargeEvd(
+    String brandID,
+    double pinValue, // Denomination
+    String contact,
+    int quantity,
+  ) async {
+    _autoUpdateReference();
+
+    _log('making request for: evd recharge', LOG_LEVEL.INFO);
+
+    try {
+      Map<String, dynamic> payload = Map<String, dynamic>();
+
+      payload['BrandID'] = brandID;
+      payload['TargetNumber'] = contact;
+      payload['Denomination'] = pinValue.toString();
+      payload['Quantity'] = quantity.toString();
+
+      _log('evd recharge payload: $payload', LOG_LEVEL.INFO);
+
+      String url = _ROOT_ENDPOINT + _API_VERSION + _RECHARGE_EVD;
+
+      _headers.remove('Content-type');
+
+      var response = await http.post(
+        url,
+        body: payload,
+        headers: this._headers,
+      );
+
+      _headers['Content-type'] = _MIME_TYPES;
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('evd recharge response: $data', LOG_LEVEL.DEBUG);
+
+      if (data['ReplyCode'] == 2) {
+        // success
+        //BundleRecharge br = BundleRecharge.fromJson(response.body);
+
+        return ApiResponse(
+          message: 'evd recharge success',
+          rechargeResponse: RechargeResponse.SUCCESS,
+          apiResponse: response.body,
+        );
+      }
+
+      _log(data, LOG_LEVEL.WARNING);
+
+      return ApiResponse(
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'evd recharge failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
+        apiResponse: data,
+      );
+    }
+
+    // error
+    catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
+      return ApiResponse(
+        rechargeResponse: RechargeResponse.ERROR,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> rechargeBundle(
+    String productCode,
+    String contact, {
+
+    /// value of the bundle (optional)
+    double amount,
+    String customMessage,
+  }) async {
+    _autoUpdateReference();
+
+    _log('making request for: bundle recharge', LOG_LEVEL.INFO);
+
+    try {
+      Map<String, dynamic> payload = Map<String, dynamic>();
+
+      payload['ProductCode'] = productCode;
+
+      // optional, use product code instead
+      //payload['Amount'] = amount.toString();
+
+      if (customMessage != null) {
+        payload['CustomerSMS'] = customMessage;
+      }
+
+      // 07xxxxx | 086xxxxx
+      if (contact.startsWith('07') || contact.startsWith('08')) {
+        payload['TargetMobile'] = contact;
+      }
+
+      _log('data recharge payload: $payload', LOG_LEVEL.INFO);
+
+      String url = _ROOT_ENDPOINT + _API_VERSION + _RECHARGE_BUNDLE;
+
+      _headers.remove('Content-type');
+
+      var response = await http.post(
+        url,
+        body: payload,
+        headers: this._headers,
+      );
+
+      _headers['Content-type'] = _MIME_TYPES;
+
+      var data = jsonDecode(response.body) as Map;
+
+      _log('data recharge response: $data', LOG_LEVEL.DEBUG);
+
+      if (data['ReplyCode'] == 2) {
+        // success
+        BundleRecharge br = BundleRecharge.fromJson(response.body);
+
+        return ApiResponse(
+          message: 'bundle recharge success',
+          rechargeResponse: RechargeResponse.SUCCESS,
+          apiResponse: br,
+        );
+      }
+
+      _log(data, LOG_LEVEL.WARNING);
+
+      return ApiResponse(
+        message: data.containsKey('ReplyMessage')
+            ? data['ReplyMessage']
+            : 'bundle recharge failed',
+        rechargeResponse: RechargeResponse.API_ERROR,
+        apiResponse: data,
+      );
+    }
+
+    // error
+    catch (e) {
+      _log(e, LOG_LEVEL.ERROR);
+
+      return ApiResponse(
+        rechargeResponse: RechargeResponse.ERROR,
+        message: e.toString(),
+      );
+    }
   }
 
   Future<ApiResponse> getWalletBalance() async {
@@ -533,7 +853,6 @@ class Api {
     }
   }
 }
-
 
 /// used internally when `enableLogger` is set to true
 /// used to determine log level

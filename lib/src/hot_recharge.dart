@@ -117,6 +117,7 @@ class HotRecharge {
   }
 
   /// recharge zesa meter number, contact is where the token will be sent to as message
+  ///
   /// customMessage - Optional, customised sms to send to user upon topup, 135 chars max
   ///      custom Message place holders to use and their representation on end user:
   ///      %AMOUNT% - $xxx.xx
@@ -133,6 +134,7 @@ class HotRecharge {
   /// """;
   ///
   /// var resp = await api.rechargeZesa(2.5, '07xxxxxxxx', 'xxxxxxxxxxx', customMessage: custom_message);
+  ///
   /// print(resp.message);
   /// ```
   /// return -> [ApiResponse]
@@ -152,8 +154,92 @@ class HotRecharge {
     return zesa;
   }
 
+  /// recharge bundle package
+  ///
+  /// customMessage - Optional, customised sms to send to user upon topup, 135 chars max
+  ///      custom Message place holders to use and their representation on end user:
+  ///      %AMOUNT% - $xxx.xx
+  ///      %BUNDLE% - Name of data bundle
+  ///      %ACCESSNAME% - as defined on website (Teller | branch name)
+  ///      %COMPANYNAME% - as defined by Customer on the website www.hot.co.zw
+  ///
+  /// ```dart
+  /// final custom_message = """
+  ///   Recharge of \$ %AMOUNT% is successful.
+  ///   %BUNDLE% bundle has been recharged
+  ///   The best %COMPANYNAME%!
+  /// """;
+  ///
+  /// var resp = await api.rechargeBundle('<product-code>', '07xxxxxxxx', customMessage: custom_message);
+  /// print(resp.message);
+  /// ```
+  /// return -> [ApiResponse]
+  Future<ApiResponse> rechargeBundle(
+    String productCode,
+    String contact, {
+    String customMessage,
+  }) async {
+    final bundle = await _api.rechargeBundle(
+      productCode,
+      contact,
+      customMessage: customMessage,
+    );
+
+    return bundle;
+  }
+
+  /// get available data bundles
+  /// returns a list of data bundles in [bundles] attribute on successful [ApiResponse]
+  Future<ApiResponse> getAvailableBundles() async {
+    final bundles = await _api.getDataBundles();
+
+    return bundles;
+  }
+
+  /// query available evd (electronic vouchers)
+  Future<ApiResponse> queryEvd() async {
+    final evd = await _api.queryEVD();
+
+    return evd;
+  }
+
+  /// recharge electronic voucher
+  Future<ApiResponse> rechargeEvd(
+    String brandID,
+    double pinValue, // Denomination
+    String contact,
+    int quantity,
+  ) async {
+    final evdR = await _api.rechargeEvd(
+      brandID,
+      pinValue, // Denomination
+      contact,
+      quantity,
+    );
+
+    return evdR;
+  }
+
+  /// bulk recharge electronic voucher
+  Future<ApiResponse> bulkRechargeEvd(
+    String brandID,
+    double pinValue, // Denomination
+    int quantity,
+  ) async {
+    final bulkEvd = await _api.bulkPurchaseEvd(
+      brandID,
+      pinValue, // Denomination
+
+      quantity,
+    );
+
+    return bulkEvd;
+  }
+
   /// query previous zesa transaction by its rechargeID
+  ///
   /// also very useful for querying zesa recharge transactions for [ApiResponse] rechargeResponse -> [RechargeResponse.PENDING]
+  ///
   /// very useful when `rechargeZesa(...)` returns  [RechargeResponse.PENDING]. Its reccommended not to perform a recharge again but poll this query until transaction status is success
   /// refer to Docs for more
   Future<ApiResponse> queryZesaTransaction(int rechargeId) async {
