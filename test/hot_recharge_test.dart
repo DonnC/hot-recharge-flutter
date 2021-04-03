@@ -53,6 +53,38 @@ void main() async {
 
       expect(bal, isInstanceOf<ApiResponse>());
     });
+
+    test('get data bundles : return ApiResponse instance', () async {
+      final bal = await api.getAvailableBundles();
+
+      print(bal.apiResponse);
+      print(bal.message);
+      print(bal.rechargeResponse);
+
+      expect(bal, isInstanceOf<ApiResponse>());
+    });
+
+    test('get evd pins : return ApiResponse instance', () async {
+      final bal = await api.queryEvd();
+
+      print(bal.apiResponse);
+      print(bal.message);
+      print(bal.rechargeResponse);
+
+      expect(bal, isInstanceOf<ApiResponse>());
+    });
+
+    test('recharge evd: return ApiResponse instance', () async {
+      //final bal = await api.rechargeEvd(24, 0.5, '0712359809', 1);
+      // TODO: Add proper properties here
+      final bal = await api.rechargeEvd(24, 0.5, '07xxxxxx', 1);
+
+      print(bal.apiResponse);
+      print(bal.message);
+      print(bal.rechargeResponse);
+
+      expect(bal, isInstanceOf<ApiResponse>());
+    });
   });
 
   group('Hot-Recharge: Zesa', () {

@@ -177,11 +177,13 @@ class HotRecharge {
   Future<ApiResponse> rechargeBundle(
     String productCode,
     String contact, {
+    int amount,
     String customMessage,
   }) async {
     final bundle = await _api.rechargeBundle(
       productCode,
       contact,
+      amount: amount,
       customMessage: customMessage,
     );
 
@@ -203,10 +205,12 @@ class HotRecharge {
     return evd;
   }
 
-  /// recharge electronic voucher
+  /// recharge electronic voucher for supported network
+  ///
+  /// first call [api.queryEvd()] to get appropriate fields to pass here as args
   Future<ApiResponse> rechargeEvd(
-    String brandID,
-    double pinValue, // Denomination
+    int brandID,
+    double pinValue, // the then Denomination
     String contact,
     int quantity,
   ) async {
@@ -220,9 +224,10 @@ class HotRecharge {
     return evdR;
   }
 
+  /*
   /// bulk recharge electronic voucher
   Future<ApiResponse> bulkRechargeEvd(
-    String brandID,
+    int brandID,
     double pinValue, // Denomination
     int quantity,
   ) async {
@@ -235,6 +240,7 @@ class HotRecharge {
 
     return bulkEvd;
   }
+  */
 
   /// query previous zesa transaction by its rechargeID
   ///

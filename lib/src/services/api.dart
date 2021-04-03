@@ -203,8 +203,9 @@ class Api {
     }
   }
 
-  Future<ApiResponse> bulkPurchaseEvd(
-    String brandID,
+  // TODO: Not tested
+  Future<ApiResponse> _bulkPurchaseEvd(
+    int brandID,
     double pinValue,
     int quantity,
   ) async {
@@ -215,7 +216,7 @@ class Api {
     try {
       Map<String, dynamic> payload = Map<String, dynamic>();
 
-      payload['BrandID'] = brandID;
+      payload['BrandID'] = brandID.toString();
       payload['Denomination'] = pinValue.toString();
       payload['Quantity'] = quantity.toString();
 
@@ -223,7 +224,7 @@ class Api {
 
       String url = _ROOT_ENDPOINT + _API_VERSION + _BULK_RECHARGE_EVD;
 
-      _headers.remove('Content-type');
+      //_headers.remove('Content-type');
 
       var response = await http.post(
         url,
@@ -231,7 +232,7 @@ class Api {
         headers: this._headers,
       );
 
-      _headers['Content-type'] = _MIME_TYPES;
+      //_headers['Content-type'] = _MIME_TYPES;
 
       var data = jsonDecode(response.body) as Map;
 
@@ -271,7 +272,7 @@ class Api {
   }
 
   Future<ApiResponse> rechargeEvd(
-    String brandID,
+    int brandID,
     double pinValue, // Denomination
     String contact,
     int quantity,
@@ -283,7 +284,7 @@ class Api {
     try {
       Map<String, dynamic> payload = Map<String, dynamic>();
 
-      payload['BrandID'] = brandID;
+      payload['BrandID'] = brandID.toString();
       payload['TargetNumber'] = contact;
       payload['Denomination'] = pinValue.toString();
       payload['Quantity'] = quantity.toString();
@@ -292,40 +293,55 @@ class Api {
 
       String url = _ROOT_ENDPOINT + _API_VERSION + _RECHARGE_EVD;
 
-      _headers.remove('Content-type');
+      //_headers.remove('Content-type');
+      var request = http.Request('POST', Uri.parse(url))
+        ..body = jsonEncode(payload)
+        ..headers.addAll(this._headers);
 
-      var response = await http.post(
-        url,
-        body: payload,
-        headers: this._headers,
-      );
+      var response = await request.send();
 
-      _headers['Content-type'] = _MIME_TYPES;
+      //var response = await http.post(
+      //  url,
+      //  body: payload,
+      //  headers: this._headers,
+      //);
+      //
 
-      var data = jsonDecode(response.body) as Map;
+      if (response.statusCode == 200) {
+        var _body = await response.stream.bytesToString();
 
-      _log('evd recharge response: $data', LOG_LEVEL.DEBUG);
+        //_headers['Content-type'] = _MIME_TYPES;
 
-      if (data['ReplyCode'] == 2) {
-        // success
-        //BundleRecharge br = BundleRecharge.fromJson(response.body);
+        var data = jsonDecode(_body) as Map;
+
+        _log('evd recharge response: $data', LOG_LEVEL.DEBUG);
+
+        if (data['ReplyCode'] == 2) {
+          // success
+          RechargeEvd re = RechargeEvd.fromMap(data);
+
+          return ApiResponse(
+            message: 'evd recharge success',
+            rechargeResponse: RechargeResponse.SUCCESS,
+            apiResponse: re,
+          );
+        }
+
+        _log(data, LOG_LEVEL.WARNING);
 
         return ApiResponse(
-          message: 'evd recharge success',
-          rechargeResponse: RechargeResponse.SUCCESS,
-          apiResponse: response.body,
+          message: data.containsKey('ReplyMessage')
+              ? data['ReplyMessage']
+              : 'evd recharge failed',
+          rechargeResponse: RechargeResponse.API_ERROR,
+          apiResponse: data,
         );
       }
 
-      _log(data, LOG_LEVEL.WARNING);
-
-      return ApiResponse(
-        message: data.containsKey('ReplyMessage')
-            ? data['ReplyMessage']
-            : 'evd recharge failed',
-        rechargeResponse: RechargeResponse.API_ERROR,
-        apiResponse: data,
-      );
+      // raise exception
+      else {
+        throw Exception(response.reasonPhrase);
+      }
     }
 
     // error
@@ -344,7 +360,7 @@ class Api {
     String contact, {
 
     /// value of the bundle (optional)
-    double amount,
+    int amount,
     String customMessage,
   }) async {
     _autoUpdateReference();
