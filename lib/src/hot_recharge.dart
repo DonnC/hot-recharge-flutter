@@ -208,6 +208,10 @@ class HotRecharge {
   /// recharge electronic voucher for supported network
   ///
   /// first call [api.queryEvd()] to get appropriate fields to pass here as args
+  ///
+  /// on successful, pins will be a list of string : PIN, SerialNumber, BrandID, Denomination, Expiry
+  ///
+  /// e.g ['0812273518776434,008101288101|17,.50,3/27/2021']
   Future<ApiResponse> rechargeEvd(
     int brandID,
     double pinValue, // the then Denomination
