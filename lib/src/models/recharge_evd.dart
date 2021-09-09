@@ -11,17 +11,6 @@ class RechargeEvd {
   final List<String> pins;
   final double walletBalance;
 
-  RechargeEvd({
-    this.agentReference,
-    this.amount,
-    this.discount,
-    this.rechargeID,
-    this.replyCode,
-    this.replyMsg,
-    this.pins,
-    this.walletBalance,
-  });
-
   Map<String, dynamic> toMap() {
     return {
       'AgentReference': agentReference,
@@ -34,6 +23,17 @@ class RechargeEvd {
       'WalletBalance': walletBalance,
     };
   }
+
+  RechargeEvd({
+    this.agentReference,
+    this.amount,
+    this.discount,
+    this.rechargeID,
+    this.replyCode,
+    this.replyMsg,
+    this.pins,
+    this.walletBalance,
+  });
 
   factory RechargeEvd.fromMap(Map<String, dynamic> map) {
     return RechargeEvd(

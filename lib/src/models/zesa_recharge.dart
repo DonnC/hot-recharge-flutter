@@ -16,6 +16,22 @@ class ZesaRecharge {
   final String agentReference;
   final int rechargeID;
 
+  Map<String, dynamic> toMap() {
+    return {
+      'ReplyCode': replyCode,
+      'ReplyMsg': replyMsg,
+      'WalletBalance': walletBalance,
+      'Amount': amount,
+      'Discount': discount,
+      'Meter': meter,
+      'AccountName': accountName,
+      'Address': address,
+      'Tokens': tokens?.map((x) => x.toMap())?.toList(),
+      'AgentReference': agentReference,
+      'RechargeID': rechargeID,
+    };
+  }
+
   ZesaRecharge({
     this.replyCode,
     this.replyMsg,
@@ -58,21 +74,7 @@ class ZesaRecharge {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'ReplyCode': replyCode,
-      'ReplyMsg': replyMsg,
-      'WalletBalance': walletBalance,
-      'Amount': amount,
-      'Discount': discount,
-      'Meter': meter,
-      'AccountName': accountName,
-      'Address': address,
-      'Tokens': tokens?.map((x) => x.toMap())?.toList(),
-      'AgentReference': agentReference,
-      'RechargeID': rechargeID,
-    };
-  }
+  
 
   factory ZesaRecharge.fromMap(Map<String, dynamic> map) {
     return ZesaRecharge(

@@ -10,6 +10,18 @@ class ZesaTokenItem {
   final double taxAmount;
   final String zesaReference;
 
+  Map<String, dynamic> toMap() {
+    return {
+      'Token': token,
+      'Units': units,
+      'NetAmount': netAmount,
+      'Levy': levy,
+      'Arrears': arrears,
+      'TaxAmount': taxAmount,
+      'ZesaReference': zesaReference,
+    };
+  }
+
   ZesaTokenItem({
     this.token,
     this.units,
@@ -38,18 +50,6 @@ class ZesaTokenItem {
       taxAmount: taxAmount ?? this.taxAmount,
       zesaReference: zesaReference ?? this.zesaReference,
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'Token': token,
-      'Units': units,
-      'NetAmount': netAmount,
-      'Levy': levy,
-      'Arrears': arrears,
-      'TaxAmount': taxAmount,
-      'ZesaReference': zesaReference,
-    };
   }
 
   factory ZesaTokenItem.fromMap(Map<String, dynamic> map) {

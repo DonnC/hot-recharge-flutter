@@ -11,6 +11,16 @@ class ZesaCustomerDetail {
   final String agentReference;
   final CustomerInfo customerInfo;
 
+  Map<String, dynamic> toMap() {
+    return {
+      'ReplyCode': replyCode,
+      'ReplyMsg': replyMsg,
+      'Meter': meter,
+      'AgentReference': agentReference,
+      'CustomerInfo': customerInfo?.toMap(),
+    };
+  }
+
   ZesaCustomerDetail({
     this.replyCode,
     this.replyMsg,
@@ -35,15 +45,7 @@ class ZesaCustomerDetail {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'ReplyCode': replyCode,
-      'ReplyMsg': replyMsg,
-      'Meter': meter,
-      'AgentReference': agentReference,
-      'CustomerInfo': customerInfo?.toMap(),
-    };
-  }
+  
 
   factory ZesaCustomerDetail.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;

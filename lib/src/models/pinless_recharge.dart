@@ -15,6 +15,24 @@ class PinlessRecharge {
   final double walletBalance;
   final dynamic window;
 
+    Map<String, dynamic> toMap() {
+    return {
+      'AgentReference': agentReference,
+      'Amount': amount,
+      'Data': data,
+      'Discount': discount,
+      'FinalBalance': finalBalance,
+      'InitialBalance': initialBalance,
+      'RechargeID': rechargeID,
+      'ReplyCode': replyCode,
+      'ReplyMsg': replyMsg,
+      'SMS': sms,
+      'WalletBalance': walletBalance,
+      'Window': window,
+    };
+  }
+
+
   PinlessRecharge({
     this.agentReference,
     this.amount,
@@ -60,22 +78,6 @@ class PinlessRecharge {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'AgentReference': agentReference,
-      'Amount': amount,
-      'Data': data,
-      'Discount': discount,
-      'FinalBalance': finalBalance,
-      'InitialBalance': initialBalance,
-      'RechargeID': rechargeID,
-      'ReplyCode': replyCode,
-      'ReplyMsg': replyMsg,
-      'SMS': sms,
-      'WalletBalance': walletBalance,
-      'Window': window,
-    };
-  }
 
   factory PinlessRecharge.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;

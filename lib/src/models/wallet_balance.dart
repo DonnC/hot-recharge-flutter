@@ -7,6 +7,15 @@ class WalletBalance {
   final String replyMsg;
   final double walletBalance;
 
+  Map<String, dynamic> toMap() {
+    return {
+      'AgentReference': agentReference,
+      'ReplyCode': replyCode,
+      'ReplyMsg': replyMsg,
+      'WalletBalance': walletBalance,
+    };
+  }
+
   WalletBalance({
     this.agentReference,
     this.replyCode,
@@ -26,15 +35,6 @@ class WalletBalance {
       replyMsg: replyMsg ?? this.replyMsg,
       walletBalance: walletBalance ?? this.walletBalance,
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'AgentReference': agentReference,
-      'ReplyCode': replyCode,
-      'ReplyMsg': replyMsg,
-      'WalletBalance': walletBalance,
-    };
   }
 
   factory WalletBalance.fromMap(Map<String, dynamic> map) {
