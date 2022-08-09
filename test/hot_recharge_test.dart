@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:hot_recharge/hot_recharge.dart';
 
 void main() async {
@@ -88,7 +87,7 @@ void main() async {
 
     // TODO: Run this wisely (maybe once | twice with minimum amount) to save your testing zesa account balance
     test('recharge zesa: return ApiResponse instance', () async {
-      final message =
+      const message =
           'Recharge of \$ %AMOUNT% is successful.\nUnits %KWH% Kwh recharged for meter %METERNUMBER% of %ACOUNTNAME%.\nThe best %COMPANYNAME%!';
 
       // minimum zesa recharge as of this test was $20 from the api response but actual minimum is $50
