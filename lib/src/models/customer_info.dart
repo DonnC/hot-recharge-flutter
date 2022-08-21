@@ -9,10 +9,10 @@ class CustomerInfo {
   final String meterNumber;
 
   CustomerInfo({
-    this.reference,
-    this.meterNumber,
-    this.customerName,
-    this.address,
+    required this.reference,
+    required this.meterNumber,
+    required this.customerName,
+    required this.address,
   });
 
   Map<String, dynamic> toMap() {
@@ -25,8 +25,6 @@ class CustomerInfo {
   }
 
   factory CustomerInfo.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return CustomerInfo(
       customerName: map['CustomerName'],
       address: map['Address'],

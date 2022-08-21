@@ -8,17 +8,17 @@ class WalletBalance {
   final double walletBalance;
 
   WalletBalance({
-    this.agentReference,
-    this.replyCode,
-    this.replyMsg,
-    this.walletBalance,
+    required this.agentReference,
+    required this.replyCode,
+    required this.replyMsg,
+    required this.walletBalance,
   });
 
   WalletBalance copyWith({
-    String agentReference,
-    int replyCode,
-    String replyMsg,
-    double walletBalance,
+    String? agentReference,
+    int? replyCode,
+    String? replyMsg,
+    double? walletBalance,
   }) {
     return WalletBalance(
       agentReference: agentReference ?? this.agentReference,
@@ -38,8 +38,6 @@ class WalletBalance {
   }
 
   factory WalletBalance.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return WalletBalance(
       agentReference: map['AgentReference'],
       replyCode: map['ReplyCode'],

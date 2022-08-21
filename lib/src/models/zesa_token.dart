@@ -11,23 +11,23 @@ class ZesaTokenItem {
   final String zesaReference;
 
   ZesaTokenItem({
-    this.token,
-    this.units,
-    this.netAmount,
-    this.levy,
-    this.arrears,
-    this.taxAmount,
-    this.zesaReference,
+    required this.token,
+    required this.units,
+    required this.netAmount,
+    required this.levy,
+    required this.arrears,
+    required this.taxAmount,
+    required this.zesaReference,
   });
 
   ZesaTokenItem copyWith({
-    String token,
-    String units,
-    String netAmount,
-    String levy,
-    String arrears,
-    String taxAmount,
-    String zesaReference,
+    String? token,
+    double? units,
+    double? netAmount,
+    double? levy,
+    double? arrears,
+    double? taxAmount,
+    String? zesaReference,
   }) {
     return ZesaTokenItem(
       token: token ?? this.token,
@@ -53,8 +53,6 @@ class ZesaTokenItem {
   }
 
   factory ZesaTokenItem.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return ZesaTokenItem(
       token: map['Token'],
       units: map['Units'],

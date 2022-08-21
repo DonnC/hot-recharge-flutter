@@ -33,12 +33,12 @@ class Api {
 
   final Dio _dio = Dio();
 
-  Map<String, String> _headers;
+  late Map<String, String> _headers;
 
   Api({
-    this.email,
-    this.pswd,
-    this.enableLogger,
+    required this.email,
+    required this.pswd,
+    this.enableLogger = false,
   }) {
     _buildHeaders();
     _log('api service initialised', LOG_LEVEL.INFO);
@@ -261,8 +261,8 @@ class Api {
   Future<ApiResponse> rechargePinless(
     double amount,
     String contact, {
-    String brandID,
-    String customMessage,
+    String? brandID,
+    String? customMessage,
   }) async {
     _autoUpdateReference();
 
@@ -412,7 +412,7 @@ class Api {
     double amount,
     String contact,
     String meterNumber, {
-    String customMessage,
+    String? customMessage,
   }) async {
     _autoUpdateReference();
 

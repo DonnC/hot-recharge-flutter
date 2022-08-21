@@ -9,22 +9,22 @@ class ZesaCustomerDetail {
   final String replyMsg;
   final String meter;
   final String agentReference;
-  final CustomerInfo customerInfo;
+  final CustomerInfo? customerInfo;
 
   ZesaCustomerDetail({
-    this.replyCode,
-    this.replyMsg,
-    this.meter,
-    this.agentReference,
+    required this.replyCode,
+    required this.replyMsg,
+    required this.meter,
+    required this.agentReference,
     this.customerInfo,
   });
 
   ZesaCustomerDetail copyWith({
-    int replyCode,
-    String replyMsg,
-    int meter,
-    String agentReference,
-    CustomerInfo customerInfo,
+    int? replyCode,
+    String? replyMsg,
+    String? meter,
+    String? agentReference,
+    CustomerInfo? customerInfo,
   }) {
     return ZesaCustomerDetail(
       replyCode: replyCode ?? this.replyCode,
@@ -46,8 +46,6 @@ class ZesaCustomerDetail {
   }
 
   factory ZesaCustomerDetail.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return ZesaCustomerDetail(
       replyCode: map['ReplyCode'],
       replyMsg: map['ReplyMsg'],

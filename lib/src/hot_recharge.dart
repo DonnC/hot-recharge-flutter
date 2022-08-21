@@ -15,17 +15,17 @@ class HotRecharge {
   // flag to enable | disable logging internal data to console
   final bool enableLogger;
 
-  String _email;
-  String _pswd;
+  late String _email;
+  late String _pswd;
 
-  Api _api;
+  late Api _api;
 
   /// connect to hot-recharge services, accessCode: account email, accessPswd: account password
   /// `enableLogger` set to true to enable printing internal detailed messages on console. Useful while testing
   HotRecharge({
-    @required this.accessCode,
-    @required this.accessPswd,
-    this.enableLogger: false,
+    required this.accessCode,
+    required this.accessPswd,
+    this.enableLogger = false,
   }) {
     _email = accessCode.trim();
     _pswd = accessPswd.trim();
@@ -84,8 +84,8 @@ class HotRecharge {
   Future<ApiResponse> topupNumber(
     double amount,
     String contact, {
-    String brandID,
-    String customMessage,
+    String? brandID,
+    String? customMessage,
   }) async {
     final topup = await _api.rechargePinless(
       amount,
@@ -141,7 +141,7 @@ class HotRecharge {
     double amount,
     String contact,
     String meterNumber, {
-    String customMessage,
+    String? customMessage,
   }) async {
     final zesa = await _api.rechargeZesa(
       amount,
