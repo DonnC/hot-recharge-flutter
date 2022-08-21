@@ -7,11 +7,11 @@ class EndUserBalance {
   final String windowPeriod;
   final String agentReference;
   EndUserBalance({
-    this.replyCode,
-    this.replyMsg,
-    this.mobileBalance,
-    this.windowPeriod,
-    this.agentReference,
+    required this.replyCode,
+    required this.replyMsg,
+    required this.mobileBalance,
+    required this.windowPeriod,
+    required this.agentReference,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,9 +26,9 @@ class EndUserBalance {
 
   factory EndUserBalance.fromMap(Map<String, dynamic> map) {
     return EndUserBalance(
-      replyCode: map['ReplyCode']?.toInt(),
+      replyCode: map['ReplyCode'],
       replyMsg: map['ReplyMsg'],
-      mobileBalance: map['MobileBalance']?.toDouble(),
+      mobileBalance: map['MobileBalance'],
       windowPeriod: map['WindowPeriod'],
       agentReference: map['AgentReference'],
     );

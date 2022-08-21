@@ -8,17 +8,17 @@ class ZesaWalletBalance {
   final double walletBalance;
 
   ZesaWalletBalance({
-    this.agentReference,
-    this.replyCode,
-    this.replyMsg,
-    this.walletBalance,
+    required this.agentReference,
+    required this.replyCode,
+    required this.replyMsg,
+    required this.walletBalance,
   });
 
   ZesaWalletBalance copyWith({
-    String agentReference,
-    int replyCode,
-    String replyMsg,
-    double walletBalance,
+    String? agentReference,
+    int? replyCode,
+    String? replyMsg,
+    double? walletBalance,
   }) {
     return ZesaWalletBalance(
       agentReference: agentReference ?? this.agentReference,
@@ -38,8 +38,6 @@ class ZesaWalletBalance {
   }
 
   factory ZesaWalletBalance.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return ZesaWalletBalance(
       agentReference: map['AgentReference'],
       replyCode: map['ReplyCode'],

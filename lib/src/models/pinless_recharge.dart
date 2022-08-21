@@ -16,32 +16,32 @@ class PinlessRecharge {
   final dynamic window;
 
   PinlessRecharge({
-    this.agentReference,
-    this.amount,
-    this.data,
-    this.discount,
-    this.finalBalance,
-    this.initialBalance,
-    this.rechargeID,
-    this.replyCode,
-    this.replyMsg,
-    this.sms,
-    this.walletBalance,
+    required this.agentReference,
+    required this.amount,
+    required this.data,
+    required this.discount,
+    required this.finalBalance,
+    required this.initialBalance,
+    required this.rechargeID,
+    required this.replyCode,
+    required this.replyMsg,
+    required this.sms,
+    required this.walletBalance,
     this.window,
   });
 
   PinlessRecharge copyWith({
-    String agentReference,
-    double amount,
-    double data,
-    double discount,
-    double finalBalance,
-    double initialBalance,
-    int rechargeID,
-    int replyCode,
-    String replyMsg,
-    int sms,
-    double walletBalance,
+    String? agentReference,
+    double? amount,
+    double? data,
+    double? discount,
+    double? finalBalance,
+    double? initialBalance,
+    int? rechargeID,
+    int? replyCode,
+    String? replyMsg,
+    int? sms,
+    double? walletBalance,
     dynamic window,
   }) {
     return PinlessRecharge(
@@ -78,8 +78,6 @@ class PinlessRecharge {
   }
 
   factory PinlessRecharge.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return PinlessRecharge(
       agentReference: map['AgentReference'],
       amount: map['Amount'],

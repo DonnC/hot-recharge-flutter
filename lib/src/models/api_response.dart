@@ -12,9 +12,9 @@ class ApiResponse {
   final String message;
 
   ApiResponse({
-    this.rechargeResponse,
+    required this.rechargeResponse,
     this.apiResponse,
-    this.message,
+    required this.message,
   });
 
   @override

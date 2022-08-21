@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:hot_recharge/hot_recharge.dart';
+import '../../hot_recharge.dart';
 
 /// query zesa transaction success response model
 /// it return same original response [ZesaRecharge] with additional information of [CustomerInfo]
@@ -16,36 +16,36 @@ class QueryZesaTransaction {
   final List<ZesaTokenItem> tokens;
   final String agentReference;
   final int rechargeID;
-  final CustomerInfo customerInfo;
+  final CustomerInfo? customerInfo;
 
   QueryZesaTransaction({
-    this.replyCode,
-    this.replyMsg,
-    this.walletBalance,
-    this.amount,
-    this.discount,
-    this.meter,
-    this.accountName,
-    this.address,
-    this.tokens,
-    this.agentReference,
-    this.rechargeID,
+    required this.replyCode,
+    required this.replyMsg,
+    required this.walletBalance,
+    required this.amount,
+    required this.discount,
+    required this.meter,
+    required this.accountName,
+    required this.address,
+    required this.tokens,
+    required this.agentReference,
+    required this.rechargeID,
     this.customerInfo,
   });
 
   QueryZesaTransaction copyWith({
-    int replyCode,
-    String replyMsg,
-    double walletBalance,
-    double amount,
-    double discount,
-    String meter,
-    String accountName,
-    String address,
-    List<ZesaTokenItem> tokens,
-    String agentReference,
-    int rechargeID,
-    ZesaCustomerDetail customerInfo,
+    int? replyCode,
+    String? replyMsg,
+    double? walletBalance,
+    double? amount,
+    double? discount,
+    String? meter,
+    String? accountName,
+    String? address,
+    List<ZesaTokenItem>? tokens,
+    String? agentReference,
+    int? rechargeID,
+    CustomerInfo? customerInfo,
   }) {
     return QueryZesaTransaction(
       replyCode: replyCode ?? this.replyCode,
@@ -73,10 +73,10 @@ class QueryZesaTransaction {
       'Meter': meter,
       'AccountName': accountName,
       'Address': address,
-      'Tokens': tokens?.map((x) => x.toMap())?.toList(),
+      'Tokens': tokens.map((x) => x.toMap()).toList(),
       'AgentReference': agentReference,
       'RechargeID': rechargeID,
-      'CustomerInfo': customerInfo.toMap(),
+      'CustomerInfo': customerInfo?.toMap(),
     };
   }
 
